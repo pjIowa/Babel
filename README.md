@@ -1,15 +1,45 @@
 # Babel
 
-<dl>
-  <dt>First Goal: classify phrases to english from french</dt>
-  <dd>get lexicon of french phrases to english phrases</dd>
-  <dd>capture audio of french phrases from Mac say tool</dd>
-  <dd>create model</dd>
-  <dd>train model</dd>
-</dl>
+## Roadmap
+   Logistic regression with gradient descent
+   
+   Graph loss over time steps
+   
+   Spectrogram of wav file
+   
+   1 hidden layer neural network
+   
+   Restricted Boltzmann Machine (RBM)
+   
+   Convolutional Deep Belief Network (CDBN)
 
-<dl>
-<dt>create model</dt>
-<dd>feature learn on french phrases using Convolutional deep belief networks</dd>
-<dd>scan audio for matches using moving window</dd>
-</dl>
+   Lexicon of french phrases to english phrases
+   
+   Capture audio of french phrases from Mac say tool
+   
+   Feature learn on french phrase audio using CDBN
+   
+   Create Classification Model
+   
+   Train Model
+
+## Libaries to Use:
+   armadillo, for linear algebra
+   
+   gnuplot, for data visualization
+
+## External Datasets to Use:
+   http://marsyasweb.appspot.com/download/data_sets/ , files vs. music genre
+   
+   http://archive.ics.uci.edu/ml/datasets/Pima+Indians+Diabetes , body measurements vs. existence of diabetes 
+   
+   https://archive.ics.uci.edu/ml/datasets/Iris , flower measurements vs. iris type
+   
+   http://yann.lecun.com/exdb/mnist/ , image of number vs. number
+
+## References:
+   Andrew Ng paper on speech classification, after feature learning with CDBN
+http://papers.nips.cc/paper/3674-unsupervised-feature-learning-for-audio-classification-using-convolutional-deep-belief-networks.pdf
+   
+   Montreal paper on music genre classification, after feature learning with CDBN
+http://ismir2010.ismir.net/proceedings/ismir2010-58.pdf
