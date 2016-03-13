@@ -25,16 +25,16 @@
    Train Model
 
 ## Libaries to Use:
-   armadillo, for linear algebra
+   armadillo, for linear algebra ✓
    
    gnuplot, for data visualization
 
 ## External Datasets to Use:
    http://marsyasweb.appspot.com/download/data_sets/ , files vs. music genre
    
-   http://archive.ics.uci.edu/ml/datasets/Pima+Indians+Diabetes , body measurements vs. existence of diabetes 
+   http://archive.ics.uci.edu/ml/datasets/Pima+Indians+Diabetes , body measurements vs. existence of diabetes ✓
    
-   https://www.umass.edu/statdata/statdata/stat-logistic.html , myopia factors vs. existence of myopia 
+   https://www.umass.edu/statdata/statdata/stat-logistic.html , myopia factors vs. existence of myopia ✓
    
    https://archive.ics.uci.edu/ml/datasets/Iris , flower measurements vs. iris type
    
