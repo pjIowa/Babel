@@ -16,13 +16,21 @@ Licensed under the [MIT License](https://opensource.org/licenses/MIT)
 
    Lexicon of french phrases to english phrases
    
-   Capture audio of french phrases from Mac say tool
+   Audio files of french phrases from Mac say tool
    
-   Feature learn on french phrase audio using CDBN
+   Features learned using french phrase audio and CDBN
    
-   Create Classification Model
+   Classification model
    
-   Train Model
+   Train model
+   
+   Deploy app on iPhone for Bluetooth earbuds
+   
+## Mechanical Turk Roadmap
+  * Get text of French translated to English
+  * Get edits for translation
+  * Get ratings for edits
+  * Keep highest rated edit as correct translation
 
 ## Libaries to Use:
    armadillo, for linear algebra ✓
@@ -54,3 +62,7 @@ Licensed under the [MIT License](https://opensource.org/licenses/MIT)
    RBM implementation in Python:
 
    https://github.com/echen/restricted-boltzmann-machines
+
+   DARPA Mechanical Turk Case Study for Arabic translation:
+   
+   https://requester.mturk.com/case_studies/cs/darpa
