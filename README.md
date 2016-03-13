@@ -1,5 +1,5 @@
 # Babel
-[MIT License](https://opensource.org/licenses/MIT)
+Licensed under the [MIT License](https://opensource.org/licenses/MIT)
 
 ## Roadmap
    Logistic regression with gradient descent ✓
