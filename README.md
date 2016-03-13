@@ -39,6 +39,8 @@ Licensed under the [MIT License](https://opensource.org/licenses/MIT)
    https://archive.ics.uci.edu/ml/datasets/Iris , flower measurements vs. iris type
    
    http://yann.lecun.com/exdb/mnist/ , image of number vs. number
+   
+   http://www.manythings.org/bilingual/ , translation corpus for english vs. other other languages
 
 ## References:
    Andrew Ng paper on speech classification, after feature learning with CDBN
