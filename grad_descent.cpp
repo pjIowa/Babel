@@ -8,6 +8,11 @@ double computeLogitError(arma::mat weights, double bias, arma::mat input, arma::
 std::pair<arma::mat, double> updateParameters(arma::mat weights, double bias, arma::mat input, arma::mat target, double learningRate);
 void gradientDescent(arma::mat weights, double bias, arma::mat input, arma::mat target, double learningRate);
 
+// GnuPlot pipe:
+// http://stackoverflow.com/questions/30762001/c-gnuplot-pipe-input-from-c-defined-variables
+// GnuPlot simple example
+// http://stackoverflow.com/questions/4705435/passing-data-from-c-to-gnuplot-example-using-gnuplot-iostream-interface
+
 int main() {
     std::string fileName = "diabetes.csv";
     arma::mat csvData;
