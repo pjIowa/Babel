@@ -1,4 +1,5 @@
 # Babel
+[MIT License](https://opensource.org/licenses/MIT)
 
 ## Roadmap
    Logistic regression with gradient descent
@@ -32,6 +33,8 @@
    http://marsyasweb.appspot.com/download/data_sets/ , files vs. music genre
    
    http://archive.ics.uci.edu/ml/datasets/Pima+Indians+Diabetes , body measurements vs. existence of diabetes 
+   
+   https://www.umass.edu/statdata/statdata/stat-logistic.html , myopia factors vs. existence of myopia 
    
    https://archive.ics.uci.edu/ml/datasets/Iris , flower measurements vs. iris type
    
