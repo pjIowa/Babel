@@ -46,3 +46,6 @@ http://papers.nips.cc/paper/3674-unsupervised-feature-learning-for-audio-classif
    
    Montreal paper on music genre classification, after feature learning with CDBN
 http://ismir2010.ismir.net/proceedings/ismir2010-58.pdf
+
+   RBM implementation in Python:
+https://github.com/echen/restricted-boltzmann-machines
