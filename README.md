@@ -2,7 +2,7 @@
 [MIT License](https://opensource.org/licenses/MIT)
 
 ## Roadmap
-   Logistic regression with gradient descent
+   Logistic regression with gradient descent, Complete
    
    Graph loss over time steps
    
