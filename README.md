@@ -32,10 +32,10 @@ Licensed under the [MIT License](https://opensource.org/licenses/MIT)
    
    Deploy app on iPhone for Bluetooth earbuds
 
-## Libaries to Use:
-   armadillo, for linear algebra ✓
+## Libaries:
+   armadillo, for linear algebra
    
-   gnuplot, for data visualization ✓
+   gnuplot, for data visualization
 
 ## External Datasets to Use:
    http://marsyasweb.appspot.com/download/data_sets/ , files vs. music genre
