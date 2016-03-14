@@ -79,7 +79,7 @@ g++ file.cpp -o file.o -lsndfile
    
    http://ismir2010.ismir.net/proceedings/ismir2010-58.pdf
 
-   RBM implementation in Python:
+   RBM implementation in Python
 
    https://github.com/echen/restricted-boltzmann-machines
 
