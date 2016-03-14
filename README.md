@@ -1,4 +1,6 @@
 # Babel
+End Goal: iPhone app to translate a foreign language in real-time
+
 Licensed under the [MIT License](https://opensource.org/licenses/MIT)
 
 ## Roadmap
@@ -29,17 +31,11 @@ Licensed under the [MIT License](https://opensource.org/licenses/MIT)
    Train model
    
    Deploy app on iPhone for Bluetooth earbuds
-   
-## Mechanical Turk Roadmap
-  * Get text of French translated to English
-  * Get edits for translation
-  * Get ratings for edits
-  * Keep highest rated edit as correct translation
 
 ## Libaries to Use:
    armadillo, for linear algebra ✓
    
-   gnuplot, for data visualization
+   gnuplot, for data visualization ✓
 
 ## External Datasets to Use:
    http://marsyasweb.appspot.com/download/data_sets/ , files vs. music genre
