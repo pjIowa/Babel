@@ -3,6 +3,31 @@ End Goal: iPhone app to translate a foreign language in real-time
 
 Licensed under the [MIT License](https://opensource.org/licenses/MIT)
 
+## Install Libaries
+
+```
+brew install armadillo
+brew install libsndfile
+brew install gnuplot --with-qt
+```
+
+## Build Code using armadillo
+
+```
+g++ file.cpp -o file.o -O2 -larmadillo
+```
+
+## Build Code using sndfile
+
+```
+g++ file.cpp -o file.o -lsndfile
+```
+
+## Run Code
+```
+./file.o
+```
+
 ## Roadmap
    Logistic regression with gradient descent ✓
    
@@ -31,11 +56,6 @@ Licensed under the [MIT License](https://opensource.org/licenses/MIT)
    Train model
    
    Deploy app on iPhone for Bluetooth earbuds
-
-## Libaries:
-   armadillo, for linear algebra
-   
-   gnuplot, for data visualization
 
 ## External Datasets to Use:
    http://marsyasweb.appspot.com/download/data_sets/ , files vs. music genre
