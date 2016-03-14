@@ -83,6 +83,10 @@ g++ file.cpp -o file.o -lsndfile
 
    https://github.com/echen/restricted-boltzmann-machines
 
-   DARPA Mechanical Turk Case Study for Arabic translation:
+   DARPA Mechanical Turk Case Study for Arabic translation
    
    https://requester.mturk.com/case_studies/cs/darpa
+   
+   Google paper on offline speech recognition
+   
+   http://arxiv.org/pdf/1603.03185.pdf
