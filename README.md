@@ -4,6 +4,8 @@ Licensed under the [MIT License](https://opensource.org/licenses/MIT)
 ## Roadmap
    Logistic regression with gradient descent ✓
    
+   ![state hover page](screenshots/regression.png) 
+   
    Graph loss over time steps
    
    Spectrogram of wav file
