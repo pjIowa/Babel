@@ -6,14 +6,13 @@
 
 double computeLogitError(arma::mat weights, double bias, arma::mat input, arma::mat target);
 std::pair<arma::mat, double> updateParameters(arma::mat weights, double bias, arma::mat input, arma::mat target, double learningRate);
-void gradientDescent(arma::mat weights, double bias, arma::mat input, arma::mat target, double learningRate);
-
-// GnuPlot pipe:
-// http://stackoverflow.com/questions/30762001/c-gnuplot-pipe-input-from-c-defined-variables
-// GnuPlot simple example
-// http://stackoverflow.com/questions/4705435/passing-data-from-c-to-gnuplot-example-using-gnuplot-iostream-interface
+std::vector<double> gradientDescent(arma::mat weights, double bias, arma::mat input, arma::mat target, double initialLearningRate, int numIterations);
+void plotData(std::vector<double> data);
 
 int main() {
+    int numIterations = 10000;
+    std::vector<double> errorList (numIterations, 0.0);
+    
     std::string fileName = "diabetes.csv";
     arma::mat csvData;
     csvData.load(fileName, arma::csv_ascii);
@@ -23,8 +22,9 @@ int main() {
     double bias = 0.0;
     double learningRate = 0.001;
     std::cout << "Gradient Descent on " << fileName << std::endl;
-    gradientDescent(weights, bias, input, target, learningRate);
-
+    errorList = gradientDescent(weights, bias, input, target, learningRate, numIterations);
+    plotData(errorList);
+    
     fileName = "myopia.csv";
     csvData.load(fileName, arma::csv_ascii);
     input = csvData.cols(1, 13);
@@ -32,15 +32,41 @@ int main() {
     weights.zeros(13, 1);
     learningRate = 0.0001;
     std::cout << "Gradient Descent on " << fileName << std::endl;
-    gradientDescent(weights, bias, input, target, learningRate);
+    errorList = gradientDescent(weights, bias, input, target, learningRate, numIterations);
+    plotData(errorList);
     
     return 0;
 }
 
-void gradientDescent(arma::mat weights, double bias, arma::mat input, arma::mat target, double initialLearningRate) {
+void plotData(std::vector<double> data) {
+    FILE *pipe = popen("gnuplot -persist" , "w");
+    
+    if (pipe != NULL) {
+        
+        fprintf(pipe, "set style line 5 lt rgb 'cyan' lw 3 pt 6 \n");
+        fprintf(pipe, "plot '-' with linespoints ls 5 \n");
+        
+        for (int i=0; i<data.size(); i++) {
+            fprintf(pipe, "%lf %lf\n", double(i), data[i]);
+        }
+        fprintf(pipe, "e");
+        
+        fflush(pipe);
+        pclose(pipe);
+    }
+    else {
+        std::cout << "Could not open gnuplot pipe" << std::endl;
+    }
+}
+
+std::vector<double> gradientDescent(arma::mat weights, double bias, arma::mat input, arma::mat target, double initialLearningRate, int numIterations) {
     double logitError = computeLogitError(weights, bias, input, target);
     double learningRate = initialLearningRate;
-    for(int i=0; i<10000; i++) {
+    
+    std::vector<double> errorList (numIterations, 0.0);
+    
+    for(int i=0; i<numIterations; i++) {
+        errorList[i] = logitError;
         if (i%1000==0) {
             std::cout << "Step " << i << " " << logitError << std::endl;
         }
@@ -49,6 +75,8 @@ void gradientDescent(arma::mat weights, double bias, arma::mat input, arma::mat 
         bias = updatedSet.second;
         logitError = computeLogitError(weights, bias, input, target);
     }
+    
+    return errorList;
 }
 
 double computeLogitError(arma::mat weights, double bias, arma::mat input, arma::mat target) {
