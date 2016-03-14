@@ -6,7 +6,7 @@ Licensed under the [MIT License](https://opensource.org/licenses/MIT)
    
    ![regression](screenshots/regression.png) 
    
-   Graph loss over time steps
+   Graph loss over time steps ✓
    
    ![graph loss](screenshots/myopia_loss.png) 
    
