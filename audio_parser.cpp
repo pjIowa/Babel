@@ -51,6 +51,7 @@ std::pair< arma::mat, double > readWaveFile(std::string fileName) {
 }
 
 arma::mat makeFFT(arma::mat wave) {
+    //TODO: use both channels
     arma::cx_mat p_complex = arma::fft(wave.col(0));
     int n = p_complex.n_rows; 
     int nUniquePoints = ceil((n+1)/2.0);
