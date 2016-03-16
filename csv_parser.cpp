@@ -9,8 +9,8 @@ void printMatrix(std::vector< std::vector<float> > matrix);
 
 int main() {
     std::string fileName = "diabetes.csv";
-//    std::vector< std::vector<float> > csvMatrix = parseCsv(fileName);
-//    printMatrix(csvMatrix);
+    std::vector< std::vector<float> > csvMatrix = parseCsv(fileName);
+    printMatrix(csvMatrix);
     return 0;
 }
 
