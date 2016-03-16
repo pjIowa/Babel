@@ -45,8 +45,6 @@ std::pair< arma::mat, double > readWaveFile(std::string fileName) {
     arma::mat rawSoundMatrix(buffer, numberOfFrames, 2, true, true);
     free(buffer);
     
-    printf("Read %ld frames from %s, Sample rate: %d Hz, Length: %f seconds\n", numFrames, fileName.c_str(), sndInfo.samplerate, (float)numFrames/sndInfo.samplerate);
-    
     return std::make_pair(rawSoundMatrix, sndInfo.samplerate);
 }
 
