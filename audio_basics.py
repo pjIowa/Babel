@@ -7,6 +7,7 @@ def parseAudio():
     # sound pressure vs. time (ms)
     sampFreq, snd = wavfile.read('440_sine.wav')
     s1 = snd[:,0]
+    plotFFT(sampFreq, s1)
     
     # complex128, 2 floats at 64 bit
     # magnitude and phase of frequencies
@@ -34,6 +35,7 @@ def parseAudio():
     freqArray = arange(0, nUniquePts, 1.0) * (sampFreq / n)
 
     RANGE = [40,80,120,180,300]
+    
     
 
 # plot tone, amplitude vs. time (ms)
