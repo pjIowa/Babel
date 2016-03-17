@@ -102,7 +102,25 @@ void plotWave(arma::mat wave, double sampleFrequency) {
 }
 
 int main (void) {
+    
+    //Create Spectrogram
+    //get raw signal and sample frequency
     std::pair< arma::mat, double > dataPair = readWaveFile("440_sine.wav");
+    //apply hann window function, reduce spectral leakage
+    //break into equal chunks of sample points, count should be power of 2
+    //use 50% overlap, retain information lost from window function
+    //start count at 128, higher count is higher frequency resolution 
+    //Andrew Ng uses 20ms in paper, so also try 1024
+    //for each chunk and channel
+        //set n to number of sample points
+        //determine correct window function and apply
+        //apply fft, use fftw library for speed
+        //keep all frequencies below nyquist frequency, sampleFrequency/2
+        //if n is even, keep the nyquist frequency too
+        //scale by n, remove effect on magnitude from length of signal
+        //apply absolute value, combines R & I components
+        //apply 20*log, converts magnitude to dB scale
+        //each chunk now provides accurate frequency strength over time
     arma::mat rawWave = dataPair.first;
     double sampleFrequency = dataPair.second;
     plotWave(rawWave, sampleFrequency);
