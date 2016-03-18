@@ -9,18 +9,33 @@ Licensed under the [MIT License](https://opensource.org/licenses/MIT)
 brew install armadillo
 brew install libsndfile
 brew install gnuplot --with-qt
+brew install fftw
 ```
 
-## Build Code using armadillo
+## Build Code
 
 ```
-g++ file.cpp -o file.o -O2 -larmadillo
+g++ file.cpp -o file.o 
 ```
 
-## Build Code using sndfile
+## Build Flags for Libraries
+
+Armadillo
 
 ```
-g++ file.cpp -o file.o -lsndfile
+-O2 -larmadillo
+```
+
+Libsndfile
+
+```
+-lsndfile
+```
+
+FFTW
+
+```
+-lfftw3
 ```
 
 ## Run Code
