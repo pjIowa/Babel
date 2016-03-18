@@ -49,9 +49,6 @@ std::pair<arma::mat, SF_INFO> readWaveFile(std::string fileName) {
 }
 
 arma::mat parseFrequencyStrengths(arma::mat rawSound) {
-    arma::mat retMatrix;
-    retMatrix.zeros(size(rawSound));
-    
     //break into equal chunks of sample points, n should be power of 2
     //start count at 128, higher count is higher frequency resolution 
     //Andrew Ng uses 20ms in paper, so try up to 1024
@@ -59,6 +56,13 @@ arma::mat parseFrequencyStrengths(arma::mat rawSound) {
     long rows = rawSound.n_rows;
     long cols = rawSound.n_cols;
     long numIntervals = rows/n;
+    
+    //keep frequencies up to and including 20kHz
+    //this is within the expected Nyquist frequency: 22.5kHz
+    long frequencyCap = 20000;
+    
+    arma::mat retMatrix;
+    retMatrix.zeros(numIntervals, frequencyCap);
     
     for(long i=0; i<=numIntervals; i++) {
         
@@ -91,8 +95,7 @@ arma::mat parseFrequencyStrengths(arma::mat rawSound) {
             
             fftw_execute(plan);
             
-            //keep all frequencies below nyquist frequency, sampleFrequency/2
-            //if fftLength is even, keep the nyquist frequency too
+            //filter frequencies below cap
             
             //scale by n, remove effect on magnitude from length of signal
             //apply absolute value, combines R & I components
