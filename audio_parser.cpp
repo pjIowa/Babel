@@ -74,18 +74,21 @@ arma::mat parseFrequencyStrengths(arma::mat rawSound) {
         for(double j=0; j<cols; j++) {
             arma::uvec colVec;
             colVec << j;
-            arma::cx_mat chunk = arma::conv_to<arma::cx_mat>::from(rawSound.submat(fftRange, colVec));
-            
-            //apply hann window function, reduce spectral leakage
-            for (long i=0; i<fftLength; i++) {
-                double multiplier = 0.5 * (1 - cos(2*PI*i/(n-1)));
-                chunk(i,0) = multiplier * chunk(i,0);
-            }
+            arma::cx_mat chunk(fftLength, 1);
             
             //apply fft
             //try fftw library for speed
             fftw_complex* in = reinterpret_cast<fftw_complex*> (chunk.colptr(0));
             fftw_plan plan = fftw_plan_dft_1d(fftLength, in, in, FFTW_FORWARD, FFTW_MEASURE);
+            
+            chunk = arma::conv_to<arma::cx_mat>::from(rawSound.submat(fftRange, colVec));
+            
+            //apply hann window function, reduce spectral leakage
+            for (long i=0; i<fftLength; i++) {
+                double multiplier = 0.5 * (1 - cos(2*PI*i/(n-1)));
+                chunk(i, 0) = multiplier * chunk(i, 0);
+            }
+            
             fftw_execute(plan);
             
             //keep all frequencies below nyquist frequency, sampleFrequency/2
