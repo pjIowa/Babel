@@ -52,7 +52,7 @@ arma::mat parseFrequencyStrengths(arma::mat rawSound) {
     //break into equal chunks of sample points, n should be power of 2
     //start count at 128, higher count is higher frequency resolution 
     //Andrew Ng uses 20ms in paper, so try up to 1024
-    long n = 128;
+    long n = 1024;
     long rows = rawSound.n_rows;
     long cols = rawSound.n_cols;
     long numIntervals = rows/n;
