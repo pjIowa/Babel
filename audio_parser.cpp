@@ -13,7 +13,8 @@
 #define PI 3.14159265
 
 std::pair<arma::mat, SF_INFO>  readWaveFile(std::string fileName);
-arma::mat parseFrequencyStrengths(arma::mat rawSound);
+arma::cube parseFrequencyStrengths(arma::mat rawSound);
+void plotSpectrogram(arma::cube strengths, long frames, long samplerate);
 
 std::pair<arma::mat, SF_INFO> readWaveFile(std::string fileName) {
     SF_INFO soundInfo;
@@ -32,94 +33,133 @@ std::pair<arma::mat, SF_INFO> readWaveFile(std::string fileName) {
         long numChannels = soundInfo.channels;
         long numElems = numFrames*numChannels;
         double* tempBuffer = new double[numElems];
-        buffer.zeros(numFrames, numChannels);
-        long numParsedFrames = sf_readf_double(sndFile, tempBuffer, soundInfo.frames);
-        if (numParsedFrames != numFrames) {
-            fprintf(stderr, "Did not read enough frames for source\n");
+        if (tempBuffer == NULL) {
+            fprintf(stderr, "Could not allocate memory for file\n");
         }
-        for(long i=0; i<numElems; i++) {
-            long row = i / numChannels;
-            long column = i % numChannels;
-            buffer(row,column) = tempBuffer[i];
+        else {
+            buffer.zeros(numFrames, numChannels);
+            double numParsedFrames = sf_readf_double(sndFile, tempBuffer, soundInfo.frames);
+            if (numParsedFrames != numFrames) {
+                fprintf(stderr, "Did not read enough frames for source\n");
+            }
+            for(long i=0; i<numElems; i++) {
+                long row = i / numChannels;
+                long column = i % numChannels;
+                buffer(row,column) = tempBuffer[i];
+            }
+            free(tempBuffer);
         }
-        free(tempBuffer);
         sf_close(sndFile);
     }
     return std::make_pair(buffer, soundInfo);
 }
 
-arma::mat parseFrequencyStrengths(arma::mat rawSound) {
-    //break into equal chunks of sample points, n should be power of 2
-    //start count at 128, higher count is higher frequency resolution 
-    //Andrew Ng uses 20ms in paper, so try up to 1024
-    long n = 1024;
-    long rows = rawSound.n_rows;
-    long cols = rawSound.n_cols;
-    long numIntervals = rows/n;
+arma::cube parseFrequencyStrengths(arma::mat rawSound) {
+    double numFrequencyBins = 1024;
+    double validFrequencyBins = floor(numFrequencyBins/2.0);
+    double numSamples = rawSound.n_rows;
+    double numChannels = rawSound.n_cols;
+    double numIntervals = floor(numSamples/numFrequencyBins)+1;
     
-    //keep frequencies up to and including 20kHz
-    //this is within the expected Nyquist frequency: 22.5kHz
-    long frequencyCap = 20000;
+    arma::cube retMatrix;
+    retMatrix.zeros(numChannels, numIntervals, validFrequencyBins);
     
-    arma::mat retMatrix;
-    retMatrix.zeros(numIntervals, frequencyCap);
-    
-    for(long i=0; i<=numIntervals; i++) {
-        
+    for(double i=0; i<numIntervals; i++) {
         //try 50% overlap, retain information lost from window function
-        long start = i*n;
-        long end = (i+1)*n-1;
-        if (i==numIntervals) {
-            end = rows-1;
+        double start = i*numFrequencyBins;
+        double end = (i+1)*numFrequencyBins-1;
+        if (i==(numIntervals-1)) {
+            end = numSamples-1;
         }
-        long fftLength = end-start+1;
-        
+        double fftLength = end-start+1;
         arma::uvec fftRange = arma::linspace<arma::uvec>(start, end, fftLength);
-        for(double j=0; j<cols; j++) {
+        
+        for(double j=0; j<numChannels; j++) {
             arma::uvec colVec;
             colVec << j;
             arma::cx_mat chunk(fftLength, 1);
             
-            //apply fft
-            //try fftw library for speed
+            //compute FFT
             fftw_complex* in = reinterpret_cast<fftw_complex*> (chunk.colptr(0));
             fftw_plan plan = fftw_plan_dft_1d(fftLength, in, in, FFTW_FORWARD, FFTW_MEASURE);
-            
             chunk = arma::conv_to<arma::cx_mat>::from(rawSound.submat(fftRange, colVec));
-            
-            //apply hann window function, reduce spectral leakage
-            for (long i=0; i<fftLength; i++) {
-                double multiplier = 0.5 * (1 - cos(2*PI*i/(n-1)));
-                chunk(i, 0) = multiplier * chunk(i, 0);
+            //hann window function, reduce spectral leakage
+            for (double k=0; k<fftLength; k++) {
+                double multiplier = 0.5 * (1 - cos(2.0*PI*k/(fftLength-1)));
+                chunk(k, 0) = multiplier * chunk(k, 0);
             }
-            
+            //zero fill
+            chunk.insert_rows(fftLength, numFrequencyBins-fftLength, true);
             fftw_execute(plan);
             
-            //filter frequencies below cap
+            //drop frequencies below nyquist frequency
+            chunk.shed_rows(validFrequencyBins, numFrequencyBins-1);
             
-            //scale by n, remove effect on magnitude from length of signal
+            //equalize frequency strengths for different fft lengths
+            chunk /= fftLength;
+            
             //apply absolute value, combines R & I components
+            arma::mat magnitudeChunk = abs(chunk);
             
-            //apply 20*log, converts magnitude to dB scale
-            //each chunk now provides accurate frequency strength over time
+            //converts magnitude to dB scale
+            magnitudeChunk = 20.0*log10(magnitudeChunk);
+            
+            for (double k=0; k<validFrequencyBins; k++) {
+                retMatrix(j, i, k) = magnitudeChunk(k, 0);
+            }
         }
     }
     
+    //replace -inf with lowest valid value
+    double minStrength = retMatrix.elem(find_finite(retMatrix)).min();
+    retMatrix.elem( find_nonfinite(retMatrix) ).fill(minStrength);
     return retMatrix;
 }
 
-int main (void) {
+void plotSpectrogram(arma::cube strengths, long frames, long samplerate) {
+    FILE *pipe = popen("gnuplot -persist" , "w");
     
-    //Create Spectrogram
-    //get raw signal and sound information
+    if (pipe != NULL) {
+        
+        double duration = (double) frames/samplerate;
+        double maxFrequency = samplerate/2.0;
+        long axisFontSize = 12;
+        long numChannels = strengths.n_rows;
+        long numIntervals = strengths.n_cols;
+        long numFrequencyBins = strengths.n_slices;
+        
+        fprintf(pipe, "set view map\n");
+        fprintf(pipe, "set dgrid3d\n");
+        fprintf(pipe, "set pm3d interpolate 25,25\n");
+        fprintf(pipe, "set xlabel 'Time (s)' font 'Times-Roman, %d' offset 0,-2,0\n", axisFontSize);
+        fprintf(pipe, "set ylabel 'Frequency (Hz)' font 'Times-Roman, %d' offset -2,0,0\n", axisFontSize);
+        fprintf(pipe, "set yr [0:%f]\n", maxFrequency);
+        fprintf(pipe, "set xr [0:%f]\n", duration);
+        fprintf(pipe, "splot '-' with pm3d \n");
+        
+        fprintf(pipe, "%f %d %f\n", 0.0, 0, strengths.min());
+        for (long i=0; i<numIntervals; i++) {
+            double timePoint = (double) (i+1)/numIntervals*duration;
+            for (long j=0; j<numFrequencyBins; j++) {
+                double frequency = (double) j/numFrequencyBins*maxFrequency;
+                fprintf(pipe, "%f %f %f\n", timePoint, frequency, strengths(0, i, j));
+            }
+        }
+        fprintf(pipe, "e");
+        
+        fflush(pipe);
+        pclose(pipe);
+    }
+    else {
+        std::cout << "Could not open gnuplot pipe" << std::endl;
+    }
+}
+
+int main (void) {
     std::pair<arma::mat, SF_INFO> waveData = readWaveFile("440_sine.wav");
     arma::mat buffer = waveData.first;
     SF_INFO soundInfo = waveData.second;
-    
-    //get frequency strengths per time period
-    arma::mat parsedStrengths = parseFrequencyStrengths(buffer);
-    
-    //map in gnuplot
-    
+    arma::cube parsedStrengths = parseFrequencyStrengths(buffer);
+    plotSpectrogram(parsedStrengths, soundInfo.frames, soundInfo.samplerate);
     return 0;
 }
