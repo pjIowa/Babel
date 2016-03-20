@@ -5,8 +5,6 @@
 #include <string>
 #include <sndfile.hh>
 #include <cmath>
-#include <vector>
-#include <algorithm>
 #include <math.h>
 #include <fftw3.h>
 
@@ -78,18 +76,20 @@ arma::cube parseFrequencyStrengths(arma::mat rawSound) {
             arma::uvec colVec;
             colVec << j;
             arma::cx_mat chunk(fftLength, 1);
-            
-            //compute FFT
             fftw_complex* in = reinterpret_cast<fftw_complex*> (chunk.colptr(0));
             fftw_plan plan = fftw_plan_dft_1d(fftLength, in, in, FFTW_FORWARD, FFTW_MEASURE);
             chunk = arma::conv_to<arma::cx_mat>::from(rawSound.submat(fftRange, colVec));
+            
             //hann window function, reduce spectral leakage
             for (double k=0; k<fftLength; k++) {
                 double multiplier = 0.5 * (1 - cos(2.0*PI*k/(fftLength-1)));
                 chunk(k, 0) = multiplier * chunk(k, 0);
             }
+            
             //zero fill
             chunk.insert_rows(fftLength, numFrequencyBins-fftLength, true);
+            
+            //compute FFT
             fftw_execute(plan);
             
             //drop frequencies below nyquist frequency
@@ -123,7 +123,7 @@ void plotSpectrogram(arma::cube strengths, long frames, long samplerate) {
         
         double duration = (double) frames/samplerate;
         double maxFrequency = samplerate/2.0;
-        long axisFontSize = 12;
+        int axisFontSize = 12;
         long numChannels = strengths.n_rows;
         long numIntervals = strengths.n_cols;
         long numFrequencyBins = strengths.n_slices;
