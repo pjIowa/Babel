@@ -57,8 +57,10 @@ FFTW
    440 Hz sound, FFT Length of 1024
    ![1024 spectrogram](screenshots/1024_smooth.png)
    
+   
    440 Hz sound, FFT Length of 128
    ![128 spectrogram](screenshots/128_smooth.png)
+   
    
    1 hidden layer neural network
    
