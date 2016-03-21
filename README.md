@@ -44,41 +44,39 @@ FFTW
 ```
 
 ## Roadmap
-   Logistic regression with gradient descent ✓
+Logistic regression with gradient descent ✓
    
-   ![regression](screenshots/regression.png) 
+![regression](screenshots/regression.png)
    
-   Graph loss over time steps ✓
+Graph loss over time steps ✓
    
-   ![graph loss](screenshots/myopia_loss.png) 
+![graph loss](screenshots/myopia_loss.png)
    
-   Spectrogram ✓
+Spectrogram ✓
    
-   440 Hz sound, FFT Length of 1024
-   ![1024 spectrogram](screenshots/1024_smooth.png)
+440 Hz sound, FFT Length of 1024
+![1024 spectrogram](screenshots/1024_smooth.png)
    
+440 Hz sound, FFT Length of 128
+![128 spectrogram](screenshots/128_smooth.png)
    
-   440 Hz sound, FFT Length of 128
-   ![128 spectrogram](screenshots/128_smooth.png)
+1 hidden layer neural network
    
+Restricted Boltzmann Machine (RBM)
    
-   1 hidden layer neural network
-   
-   Restricted Boltzmann Machine (RBM)
-   
-   Convolutional Deep Belief Network (CDBN)
+Convolutional Deep Belief Network (CDBN)
 
-   Lexicon of french phrases to english phrases
+Lexicon of french phrases to english phrases
    
-   Audio files of french phrases from Mac say tool
+Audio files of french phrases from Mac say tool
    
-   Features learned using french phrase audio and CDBN
+Features learned using french phrase audio and CDBN
    
-   Classification model
+Classification model
    
-   Train model
+Train model
    
-   Deploy app on iPhone for Bluetooth earbuds
+Deploy app on iPhone for Bluetooth earbuds
 
 ## External Datasets to Use:
    http://marsyasweb.appspot.com/download/data_sets/ , files vs. music genre
