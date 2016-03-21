@@ -128,7 +128,7 @@ arma::cube parseFrequencyStrengths(arma::mat rawSound, double overlap, long fftL
     return retMatrix;
 }
 
-void plotSpectrogram(arma::cube strengths, long frames, long samplerate) {
+void plotSpectrogram(arma::cube strengths, long frames, long samplerate, bool smoothGraph) {
     FILE *pipe = popen("gnuplot -persist" , "w");
     
     if (pipe != NULL) {
@@ -142,7 +142,9 @@ void plotSpectrogram(arma::cube strengths, long frames, long samplerate) {
         
         fprintf(pipe, "set view map\n");
         fprintf(pipe, "set dgrid3d\n");
-        fprintf(pipe, "set pm3d interpolate 25,25\n");
+        if (smoothGraph == true ) {
+            fprintf(pipe, "set pm3d interpolate 25,25\n");
+        }
         fprintf(pipe, "set xlabel 'Time (s)' font 'Times-Roman, %d' offset 0,-2,0\n", axisFontSize);
         fprintf(pipe, "set ylabel 'Frequency (Hz)' font 'Times-Roman, %d' offset -2,0,0\n", axisFontSize);
         fprintf(pipe, "set yr [0:%f]\n", maxFrequency);
@@ -171,10 +173,13 @@ int main (void) {
     std::pair<arma::mat, SF_INFO> waveData = readWaveFile("440_sine.wav");
     arma::mat buffer = waveData.first;
     SF_INFO soundInfo = waveData.second;
+    
     long fftLength = 1024;
     double overlap = 0.5;
-    arma::cube parsedStrengths;
-    parsedStrengths = parseFrequencyStrengths(buffer, overlap, fftLength);
-    plotSpectrogram(parsedStrengths, soundInfo.frames, soundInfo.samplerate);
+    arma::cube parsedStrengths = parseFrequencyStrengths(buffer, overlap, fftLength);
+    
+    bool smoothFlag = false;
+    plotSpectrogram(parsedStrengths, soundInfo.frames, soundInfo.samplerate, smoothFlag);
+    
     return 0;
 }
