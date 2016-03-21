@@ -79,15 +79,13 @@ Train model
 Deploy app on iPhone for Bluetooth earbuds
 
 ## External Datasets to Use:
-   http://marsyasweb.appspot.com/download/data_sets/ , files vs. music genre
-   
    http://archive.ics.uci.edu/ml/datasets/Pima+Indians+Diabetes , body measurements vs. existence of diabetes ✓
    
    https://www.umass.edu/statdata/statdata/stat-logistic.html , myopia factors vs. existence of myopia ✓
    
-   https://archive.ics.uci.edu/ml/datasets/Iris , flower measurements vs. iris type
-   
    http://yann.lecun.com/exdb/mnist/ , image of number vs. number
+   
+   http://marsyasweb.appspot.com/download/data_sets/ , files vs. music genre
    
    http://www.manythings.org/bilingual/ , translation corpus for english vs. other other languages
 
