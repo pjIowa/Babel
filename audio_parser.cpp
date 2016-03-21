@@ -11,7 +11,7 @@
 #define PI 3.14159265
 
 std::pair<arma::mat, SF_INFO>  readWaveFile(std::string fileName);
-arma::cube parseFrequencyStrengths(arma::mat rawSound);
+arma::cube parseFrequencyStrengths(arma::mat rawSound, double overlap, double fftLength);
 void plotSpectrogram(arma::cube strengths, long frames, long samplerate);
 
 std::pair<arma::mat, SF_INFO> readWaveFile(std::string fileName) {
@@ -45,74 +45,86 @@ std::pair<arma::mat, SF_INFO> readWaveFile(std::string fileName) {
                 long column = i % numChannels;
                 buffer(row,column) = tempBuffer[i];
             }
-            free(tempBuffer);
+            delete[] tempBuffer;
+//            free(tempBuffer);
         }
         sf_close(sndFile);
     }
     return std::make_pair(buffer, soundInfo);
 }
 
-arma::cube parseFrequencyStrengths(arma::mat rawSound) {
-    double numFrequencyBins = 1024;
-    double validFrequencyBins = floor(numFrequencyBins/2.0);
-    double numSamples = rawSound.n_rows;
-    double numChannels = rawSound.n_cols;
-    double numIntervals = floor(numSamples/numFrequencyBins)+1;
+arma::cube parseFrequencyStrengths(arma::mat rawSound, double overlap, long fftLength) {
+    long numSamples = rawSound.n_rows;
+    long numChannels = rawSound.n_cols;
+    
+    double numIntervals = 0;
+    if (numSamples%fftLength == 0) {
+        numIntervals = (floor(numSamples/fftLength)-1)/overlap+1;
+    }
+    else {
+        numIntervals = floor(numSamples/fftLength)/overlap+1;
+    }
+    long numSamplesOverlap = fftLength*overlap;
+    long validFFTLength = fftLength/2;
     
     arma::cube retMatrix;
-    retMatrix.zeros(numChannels, numIntervals, validFrequencyBins);
+    retMatrix.zeros(numChannels, numIntervals, validFFTLength);
     
-    for(double i=0; i<numIntervals; i++) {
-        //try 50% overlap, retain information lost from window function
-        double start = i*numFrequencyBins;
-        double end = (i+1)*numFrequencyBins-1;
-        if (i==(numIntervals-1)) {
-            end = numSamples-1;
+    for(double j=0; j<numIntervals; j++) {
+        long startIndex = j*numSamplesOverlap;
+        long endIndex = startIndex + fftLength - 1;
+        if(endIndex >= numSamples) {
+            endIndex = numSamples-1;
         }
-        double fftLength = end-start+1;
-        arma::uvec fftRange = arma::linspace<arma::uvec>(start, end, fftLength);
+        long numAvailableSamples = endIndex-startIndex+1;
+        arma::uvec fftRange = arma::linspace<arma::uvec>(startIndex, endIndex, numAvailableSamples);
         
-        for(double j=0; j<numChannels; j++) {
-            arma::uvec colVec;
-            colVec << j;
-            arma::cx_mat chunk(fftLength, 1);
+        for(double i=0; i<numChannels; i++) {
+            arma::uvec channelVec;
+            channelVec << i;
+            
+            arma::cx_vec chunk(numAvailableSamples);
             fftw_complex* in = reinterpret_cast<fftw_complex*> (chunk.colptr(0));
-            fftw_plan plan = fftw_plan_dft_1d(fftLength, in, in, FFTW_FORWARD, FFTW_MEASURE);
-            chunk = arma::conv_to<arma::cx_mat>::from(rawSound.submat(fftRange, colVec));
+            fftw_plan plan = fftw_plan_dft_1d(numAvailableSamples, in, in, FFTW_FORWARD, FFTW_MEASURE);
+            chunk = arma::conv_to<arma::cx_vec>::from(rawSound.submat(fftRange, channelVec));
             
             //hann window function, reduce spectral leakage
-            for (double k=0; k<fftLength; k++) {
-                double multiplier = 0.5 * (1 - cos(2.0*PI*k/(fftLength-1)));
-                chunk(k, 0) = multiplier * chunk(k, 0);
+            for (double k=0; k<numAvailableSamples; k++) {
+                double multiplier = 0.5 * (1 - cos(2.0*PI*k/(numAvailableSamples-1)));
+                chunk(k) = multiplier * chunk(k);
             }
             
-            //zero fill
-            chunk.insert_rows(fftLength, numFrequencyBins-fftLength, true);
+            if (numAvailableSamples < fftLength) {
+                //zero fill remainder
+                chunk.insert_rows(numAvailableSamples, fftLength-numAvailableSamples);
+            }
             
             //compute FFT
             fftw_execute(plan);
             
             //drop frequencies below nyquist frequency
-            chunk.shed_rows(validFrequencyBins, numFrequencyBins-1);
+            chunk.shed_rows(validFFTLength, fftLength-1);
             
             //equalize frequency strengths for different fft lengths
-            chunk /= fftLength;
+            chunk /= numAvailableSamples;
             
             //apply absolute value, combines R & I components
-            arma::mat magnitudeChunk = abs(chunk);
+            arma::vec magnitudeChunk = abs(chunk);
             
             //converts magnitude to dB scale
             magnitudeChunk = 20.0*log10(magnitudeChunk);
             
-            for (double k=0; k<validFrequencyBins; k++) {
-                retMatrix(j, i, k) = magnitudeChunk(k, 0);
+            for (double k=0; k<validFFTLength; k++) {
+                retMatrix(i, j, k) = magnitudeChunk(k);
             }
         }
+        
     }
     
     //replace -inf with lowest valid value
     double minStrength = retMatrix.elem(find_finite(retMatrix)).min();
     retMatrix.elem( find_nonfinite(retMatrix) ).fill(minStrength);
+    
     return retMatrix;
 }
 
@@ -159,7 +171,10 @@ int main (void) {
     std::pair<arma::mat, SF_INFO> waveData = readWaveFile("440_sine.wav");
     arma::mat buffer = waveData.first;
     SF_INFO soundInfo = waveData.second;
-    arma::cube parsedStrengths = parseFrequencyStrengths(buffer);
+    long fftLength = 1024;
+    double overlap = 0.5;
+    arma::cube parsedStrengths;
+    parsedStrengths = parseFrequencyStrengths(buffer, overlap, fftLength);
     plotSpectrogram(parsedStrengths, soundInfo.frames, soundInfo.samplerate);
     return 0;
 }
