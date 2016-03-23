@@ -16,7 +16,6 @@ brew install fftw
 
 ```
 g++ file.cpp -o file.o -std=c++11
-
 ```
 
 ## Build Flags for Libraries
