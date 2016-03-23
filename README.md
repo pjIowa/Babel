@@ -15,7 +15,8 @@ brew install fftw
 ## Build Code
 
 ```
-g++ file.cpp -o file.o 
+g++ file.cpp -o file.o -std=c++11
+
 ```
 
 ## Build Flags for Libraries
