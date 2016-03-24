@@ -3,6 +3,7 @@ End Goal: iPhone app to translate a foreign language in real-time
 
 Licensed under the [MIT License](https://opensource.org/licenses/MIT)
 
+
 ## Install Libaries
 
 ```
