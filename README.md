@@ -3,7 +3,6 @@ End Goal: iPhone app to translate a foreign language in real-time
 
 Licensed under the [MIT License](https://opensource.org/licenses/MIT)
 
-
 ## Install Libaries
 
 ```
@@ -56,9 +55,11 @@ Graph loss over time steps ✓
 Spectrogram ✓
    
 440 Hz sound, FFT Length of 1024
+
 ![1024 spectrogram](screenshots/1024_smooth.png)
    
 440 Hz sound, FFT Length of 128
+
 ![128 spectrogram](screenshots/128_smooth.png)
    
 1 hidden layer neural network
