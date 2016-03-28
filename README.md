@@ -46,7 +46,7 @@ FFTW
 ## Roadmap
 Logistic regression with gradient descent ✓
    
-![regression](screenshots/regression.png)
+![logistic regression loss](screenshots/logistic_regression.png)
    
 Graph loss over time steps ✓
    
@@ -64,7 +64,7 @@ Spectrogram ✓
    
 1 hidden layer neural network ✓
 
-![1 hidden loss](screenshots/h1_neural_net.png)
+![neural net loss](screenshots/h1_neural_net.png)
    
 Restricted Boltzmann Machine (RBM)
    
