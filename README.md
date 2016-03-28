@@ -62,7 +62,9 @@ Spectrogram ✓
 
 ![128 spectrogram](screenshots/128_smooth.png)
    
-1 hidden layer neural network
+1 hidden layer neural network ✓
+
+![1 hidden loss](screenshots/h1_neural_net.png)
    
 Restricted Boltzmann Machine (RBM)
    
