@@ -67,6 +67,8 @@ Spectrogram ✓
 ![neural net loss](screenshots/h1_neural_net.png)
    
 Restricted Boltzmann Machine (RBM)
+
+Convolutional Neural Net (CNN)
    
 Convolutional Deep Belief Network (CDBN)
 
