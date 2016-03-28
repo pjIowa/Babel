@@ -5,14 +5,25 @@
 #include <armadillo>
 
 class Neuron {
+    arma::mat sigmoid(arma::mat x) {
+        return 1.0 / (1.0 + arma::exp(-1.0*x));
+    }
+
     public:
     arma::mat weights;
+    Neuron() {
+        weights.randu(1, 1);
+    }
 
     Neuron(int neuronCount, int inputsPerNeuron) {
         arma::arma_rng::set_seed(1);
-        weights.randu(neuronCount, inputsPerNeuron);
+        weights.randu(inputsPerNeuron, neuronCount);
         weights.elem( find(weights > 1.0) ).ones();
         weights.elem( find(weights < -1.0) ).fill(-1.0);
+    }
+
+    arma::mat calculateOutput(arma::mat i) {
+        return sigmoid(i*weights);
     }
 };
 
@@ -21,26 +32,22 @@ class NeuralNetwork {
     arma::mat target;
     Neuron L1;
     Neuron L2;
-    int L1_node_count = 4;
-
-    arma::mat sigmoid(arma::mat x) {
-        return 1.0 / (1.0 + arma::exp(-1.0*x));
-    }
+    int L1NodeCount = 4;
 
     arma::mat sigmoid_derivative(arma::mat x) {
         return x % (1-x);
     }
 
     void randomInitWeights() {
-        L1 = Neuron(L1_node_count, input.n_cols);
-        L2 = Neuron(target.n_rows, L1_node_count);
+        L1 = Neuron(L1NodeCount, input.n_cols);
+        L2 = Neuron(target.n_cols, L1NodeCount);
     }
 
     public:
-    std::vector<arma::mat> make_predictions(arma::mat x) {
-        arma::mat L1_output = sigmoid(sum(x.each_row()%L1_weights, 1));
-        arma::mat L2_output = sigmoid(sum(L1_output.each_row()%L2_weights, 1));
-        return std::vector<arma::mat> { L1_node_count, L2_output };
+    std::vector<arma::mat> calculateLayerOutputs(arma::mat x) {
+        arma::mat L1_output = L1.calculateOutput(x);
+        arma::mat L2_output = L2.calculateOutput(L1_output);
+        return std::vector<arma::mat> { L1_output, L2_output };
     }
 
     NeuralNetwork(arma::mat i, arma::mat t) {
@@ -51,12 +58,21 @@ class NeuralNetwork {
 
     void train(int numIt) {
         for(int i=0; i<numIt; i++) {
-            std::pair<arma::mat, arma::mat> predictions = make_predictions(input);
-            arma::mat L1_error = predictions.first - target;
-            arma::mat L2_error = predictions.second - target;
-            arma::mat L1_adjustment = sum(input.each_col()%(L1_error%sigmoid_derivative(predictions.first)), 0);
-            arma::mat L2_adjustment = sum(input.each_col()%(L2_error%sigmoid_derivative(predictions.second)), 0);
-            weights -= adjustment;
+            std::vector<arma::mat> layerOutputs = calculateLayerOutputs(input);
+            arma::mat L1Output = layerOutputs[0];
+            arma::mat L2Output = layerOutputs[1];
+
+            arma::mat L2Error = target-L2Output;
+            arma::mat L2Delta = L2Error%sigmoid_derivative(L2Output);
+
+            arma::mat L1Error = L2Delta*L2.weights.t();
+            arma::mat L1Delta = L1Error%sigmoid_derivative(L1Output);
+
+            arma::mat L1Adjustment = input.t()*L1Delta;
+            arma::mat L2Adjustment = L1Output.t()*L2Delta;
+
+            L1.weights += L1Adjustment;
+            L2.weights += L2Adjustment;
         }
     }
 };
@@ -67,9 +83,8 @@ int main() {
     arma::mat target = {{0, 1, 1, 1, 1, 0, 0}};
     int numIterations = 60000;
 
+    std::cout << "Neural Network trained on XOR examples" << std::endl;
     NeuralNetwork model(input, target.t());
     model.train(numIterations);
-    //arma::mat test ={{1, 0, 0}};
-    //std::cout << model.make_predictions(test) << std::endl;
     return 0;
 }
