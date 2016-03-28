@@ -63,6 +63,9 @@ class NeuralNetwork {
             arma::mat L2Output = layerOutputs[1];
 
             arma::mat L2Error = target-L2Output;
+            if (i%6000==0) {
+                std::cout << "Step " << i << ": " << sum(L2Error, 0) << std::endl;
+            }
             arma::mat L2Delta = L2Error%sigmoid_derivative(L2Output);
 
             arma::mat L1Error = L2Delta*L2.weights.t();
