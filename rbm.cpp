@@ -7,92 +7,100 @@
 
 class Neuron {
     arma::mat sigmoid(arma::mat x) {
-        return 1.0 / (1.0 + arma::exp(-1.0*x));
+        return 1.0 / (1.0 + exp(-1.0*x));
     }
 
     public:
     arma::mat weights;
+    arma::mat negativeVisibleProbabilities = { {1, 3, 5}, {2, 4, 6} };
+    arma::umat positiveHiddenStates = { {1, 1, 1}, {0, 0, 0} };
+
     Neuron() {
         weights.randu(1, 1);
     }
 
     Neuron(int neuronCount, int inputsPerNeuron) {
         arma::arma_rng::set_seed(1);
-        weights.randu(inputsPerNeuron, neuronCount);
-        weights.elem( find(weights > 1.0) ).ones();
-        weights.elem( find(weights < -1.0) ).fill(-1.0);
+        weights.randn(inputsPerNeuron, neuronCount);
+        weights *= 0.1;
+        weights.insert_rows(0, 1);
+        weights.insert_cols(0, 1);
     }
 
-    arma::mat calculateOutput(arma::mat i) {
-        return sigmoid(i*weights);
+    arma::mat calculatePositiveAssociations(arma::mat x) {
+        arma::mat positiveHiddenActivations = x*weights;
+        arma::mat positiveHiddenProbabilities = sigmoid(positiveHiddenActivations);
+        arma::arma_rng::set_seed(1);
+        arma::mat randomNormalProbabilties = arma::randu(size(positiveHiddenProbabilities));
+        positiveHiddenStates = positiveHiddenProbabilities > randomNormalProbabilties;
+        return x.t()*positiveHiddenProbabilities;
+    }
+
+    arma::mat calculateNegativeAssociations() {
+        arma::mat negativeVisibleActivations = positiveHiddenStates*weights.t();
+        negativeVisibleProbabilities = sigmoid(negativeVisibleActivations);
+        negativeVisibleProbabilities.col(0) = arma::ones<arma::vec>(negativeVisibleProbabilities.n_rows);
+        arma::mat negativeHiddenActivations = negativeVisibleActivations*weights;
+        arma::mat negativeHiddenProbabilities = sigmoid(negativeHiddenActivations);
+        return negativeVisibleProbabilities.t()*negativeHiddenProbabilities;
     }
 };
 
-class NeuralNetwork {
+class RBM {
     arma::mat input;
-    arma::mat target;
     Neuron L1;
-    Neuron L2;
-    int L1NodeCount = 4;
+    int L1NodeCount = 2;
+    double learningRate = 0.0005;
+    double exampleCount = 1;
 
     arma::mat sigmoid_derivative(arma::mat x) {
         return x % (1-x);
     }
 
-    void randomInitWeights() {
-        L1 = Neuron(L1NodeCount, input.n_cols);
-        L2 = Neuron(target.n_cols, L1NodeCount);
+    void randomInitWeights(int visibleNodeCount) {
+        L1 = Neuron(L1NodeCount, visibleNodeCount);
     }
 
     public:
-    std::vector<arma::mat> calculateLayerOutputs(arma::mat x) {
-        arma::mat L1_output = L1.calculateOutput(x);
-        arma::mat L2_output = L2.calculateOutput(L1_output);
-        return std::vector<arma::mat> { L1_output, L2_output };
-    }
 
-    NeuralNetwork(arma::mat i, arma::mat t) {
-        input = i;
-        target = t;
-        randomInitWeights();
+    RBM(arma::mat i) {
+        std::cout <<"Raw Input Size: " << size(i) << std::endl;
+        input = join_rows(arma::ones<arma::mat>(i.n_rows, 1), i);
+        randomInitWeights(i.n_cols);
+        exampleCount = i.n_rows;
     }
 
     void train(int numIt) {
+        double error = 1.0;
+
         for(int i=0; i<numIt; i++) {
-            std::vector<arma::mat> layerOutputs = calculateLayerOutputs(input);
-            arma::mat L1Output = layerOutputs[0];
-            arma::mat L2Output = layerOutputs[1];
 
-            arma::mat L2Error = target-L2Output;
-            //if (i%6000==0) {
-                //std::cout << "Step " << i << ": " << sum(L2Error, 0) << std::endl;
-            //}
-            arma::mat L2Delta = L2Error%sigmoid_derivative(L2Output);
+            arma::mat positiveAssociations = L1.calculatePositiveAssociations(input);
+            arma::mat negativeAssociations = L1.calculateNegativeAssociations();
 
-            arma::mat L1Error = L2Delta*L2.weights.t();
-            arma::mat L1Delta = L1Error%sigmoid_derivative(L1Output);
+            L1.weights += learningRate * ((positiveAssociations-negativeAssociations) / exampleCount);
 
-            arma::mat L1Adjustment = input.t()*L1Delta;
-            arma::mat L2Adjustment = L1Output.t()*L2Delta;
-
-            L1.weights += L1Adjustment;
-            L2.weights += L2Adjustment;
+            if (i%1000 == 0) {
+                error = accu(square(input - L1.negativeVisibleProbabilities));
+                std::cout << "Loss: "<< error << std::endl;
+            }
         }
     }
 };
 
 
 int main() {
-    arma::mat input = {{0, 0, 1}, {0, 1, 1}, {1, 0, 1}, {0, 1, 0}, {1, 0, 0}, {1, 1, 1}, {0, 0, 0}};
-    arma::mat target = {{0, 1, 1, 1, 1, 0, 0}};
-    int numIterations = 60000;
+    //movie mapping: Harry Potter 1, Avatar, LOTR 3, Gladiator, Titanic, Troll 2
+    arma::mat input = {{1,1,1,0,0,0},{1,0,1,0,0,0},{1,1,1,0,0,0},{0,0,1,1,1,0},{0,0,1,1,0,0},{0,0,1,1,1,0}};
+    int numIterations = 7000;
 
-    std::cout << "Neural Network trained on XOR examples" << std::endl;
-    NeuralNetwork model(input, target.t());
+    std::cout << "RBM trained on movie examples" << std::endl;
+    RBM model(input);
 
     std::clock_t startTime;
     startTime = std::clock();
     model.train(numIterations);
-    std::cout << "Time: " << (std::clock() - startTime) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+    std::cout << "Training Time: " << (std::clock() - startTime) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+    arma::mat test = {{0,0,0,1,1,0}};
     return 0;
 }
