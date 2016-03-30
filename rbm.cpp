@@ -12,8 +12,8 @@ class Neuron {
 
     public:
     arma::mat weights;
-    arma::mat negativeVisibleProbabilities = { {1, 3}, {2, 4} };
-    arma::umat positiveHiddenStates = { {1, 1}, {0, 0} };
+    arma::mat negativeVisibleProbabilities;
+    arma::umat positiveHiddenStates;
 
     Neuron() {
         weights.randu(1, 1);
