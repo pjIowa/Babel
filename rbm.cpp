@@ -51,7 +51,7 @@ class RBM {
     Neuron L1;
     int L1NodeCount = 2;
     double learningRate = 0.0005;
-    double exampleCount = 1;
+    double exampleCount;
 
     arma::mat sigmoid_derivative(arma::mat x) {
         return x % (1-x);
@@ -70,7 +70,7 @@ class RBM {
     }
 
     void train(int numIt) {
-        double error = 1.0;
+        double error;
 
         for(int i=0; i<numIt; i++) {
 
