@@ -12,8 +12,8 @@ class Neuron {
 
     public:
     arma::mat weights;
-    arma::mat negativeVisibleProbabilities = { {1, 3, 5}, {2, 4, 6} };
-    arma::umat positiveHiddenStates = { {1, 1, 1}, {0, 0, 0} };
+    arma::mat negativeVisibleProbabilities = { {1, 3}, {2, 4} };
+    arma::umat positiveHiddenStates = { {1, 1}, {0, 0} };
 
     Neuron() {
         weights.randu(1, 1);
@@ -64,7 +64,6 @@ class RBM {
     public:
 
     RBM(arma::mat i) {
-        std::cout <<"Raw Input Size: " << size(i) << std::endl;
         input = join_rows(arma::ones<arma::mat>(i.n_rows, 1), i);
         randomInitWeights(i.n_cols);
         exampleCount = i.n_rows;
@@ -82,25 +81,43 @@ class RBM {
 
             if (i%1000 == 0) {
                 error = accu(square(input - L1.negativeVisibleProbabilities));
-                std::cout << "Loss: "<< error << std::endl;
+                std::cout << "Step "<< i<<": "<< error << std::endl;
             }
         }
+    }
+
+    arma::umat run(arma::mat i) {
+        arma::mat input = join_rows(arma::ones<arma::mat>(i.n_rows, 1), i);
+        arma::mat positiveAssociations = L1.calculatePositiveAssociations(input);
+        return L1.positiveHiddenStates.cols(1, L1.positiveHiddenStates.n_cols-1);
     }
 };
 
 
 int main() {
-    //movie mapping: Harry Potter 1, Avatar, LOTR 3, Gladiator, Titanic, Troll 2
     arma::mat input = {{1,1,1,0,0,0},{1,0,1,0,0,0},{1,1,1,0,0,0},{0,0,1,1,1,0},{0,0,1,1,0,0},{0,0,1,1,1,0}};
     int numIterations = 7000;
 
-    std::cout << "RBM trained on movie examples" << std::endl;
+    std::cout << "RBM trained on multiple user's movie preferences" << std::endl;
     RBM model(input);
 
     std::clock_t startTime;
     startTime = std::clock();
     model.train(numIterations);
-    std::cout << "Training Time: " << (std::clock() - startTime) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+    std::cout << "Training Time: " << (std::clock() - startTime) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl << std::endl;
     arma::mat test = {{0,0,0,1,1,0}};
+    std::cout << "Test User:" << std::endl;
+    std::cout << "Likes 1st Harry Potter:\t" << test(0,0) << std::endl;
+    std::cout << "Likes Avatar:\t\t" << test(0,1) << std::endl;
+    std::cout << "Likes 3rd LOTR:\t\t" << test(0,2) << std::endl;
+    std::cout << "Likes Gladiator:\t" << test(0,3) << std::endl;
+    std::cout << "Likes Titanic:\t\t" << test(0,4) << std::endl;
+    std::cout << "Likes Troll 2:\t\t" << test(0,5) << std::endl << std::endl;
+    startTime = std::clock();
+    arma::umat hiddenStates = model.run(test);
+    std::cout << "Prediction Time: " << (std::clock() - startTime) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+    std::cout << "Hidden Neuron Activations:" << std::endl;
+    std::cout << "Likes Oscar Winners:\t" << hiddenStates(0,0) << std::endl;
+    std::cout << "Likes SciFi / Fantasy:\t" << hiddenStates(0,1) << std::endl;
     return 0;
 }
