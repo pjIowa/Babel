@@ -14,6 +14,7 @@ class Neuron {
     arma::mat weights;
     arma::mat negativeVisibleProbabilities;
     arma::umat positiveHiddenStates;
+    arma::mat positiveAssociations, negativeAssociations;
 
     Neuron() {
         weights.randu(1, 1);
@@ -27,22 +28,26 @@ class Neuron {
         weights.insert_cols(0, 1);
     }
 
-    arma::mat calculatePositiveAssociations(arma::mat x) {
-        arma::mat positiveHiddenActivations = x*weights;
-        arma::mat positiveHiddenProbabilities = sigmoid(positiveHiddenActivations);
+    void calculatePositiveAssociations(arma::mat x) {
+        arma::mat positiveHiddenProbabilities = sigmoid(x*weights);
         arma::arma_rng::set_seed(1);
         arma::mat randomNormalProbabilties = arma::randu(size(positiveHiddenProbabilities));
         positiveHiddenStates = positiveHiddenProbabilities > randomNormalProbabilties;
-        return x.t()*positiveHiddenProbabilities;
+        positiveAssociations = x.t()*positiveHiddenProbabilities;
     }
 
-    arma::mat calculateNegativeAssociations() {
+    void calculateNegativeAssociations() {
         arma::mat negativeVisibleActivations = positiveHiddenStates*weights.t();
         negativeVisibleProbabilities = sigmoid(negativeVisibleActivations);
         negativeVisibleProbabilities.col(0) = arma::ones<arma::vec>(negativeVisibleProbabilities.n_rows);
         arma::mat negativeHiddenActivations = negativeVisibleActivations*weights;
         arma::mat negativeHiddenProbabilities = sigmoid(negativeHiddenActivations);
-        return negativeVisibleProbabilities.t()*negativeHiddenProbabilities;
+        negativeAssociations = negativeVisibleProbabilities.t()*negativeHiddenProbabilities;
+    }
+
+    void run(arma::mat x) {
+        calculatePositiveAssociations(x);
+        calculateNegativeAssociations();
     }
 };
 
@@ -73,22 +78,21 @@ class RBM {
         double error;
 
         for(int i=0; i<numIt; i++) {
-
-            arma::mat positiveAssociations = L1.calculatePositiveAssociations(input);
-            arma::mat negativeAssociations = L1.calculateNegativeAssociations();
-
-            L1.weights += learningRate * ((positiveAssociations-negativeAssociations) / exampleCount);
+            L1.run(input);
+            L1.weights += learningRate * ((L1.positiveAssociations-L1.negativeAssociations) / exampleCount);
 
             if (i%1000 == 0) {
                 error = accu(square(input - L1.negativeVisibleProbabilities));
                 std::cout << "Step "<< i<<": "<< error << std::endl;
             }
         }
+        error = accu(square(input - L1.negativeVisibleProbabilities));
+        std::cout << "Step "<< numIt <<": "<< error << std::endl;
     }
 
     arma::umat run(arma::mat i) {
         arma::mat input = join_rows(arma::ones<arma::mat>(i.n_rows, 1), i);
-        arma::mat positiveAssociations = L1.calculatePositiveAssociations(input);
+        L1.calculatePositiveAssociations(input);
         return L1.positiveHiddenStates.cols(1, L1.positiveHiddenStates.n_cols-1);
     }
 };
@@ -96,7 +100,7 @@ class RBM {
 
 int main() {
     arma::mat input = {{1,1,1,0,0,0},{1,0,1,0,0,0},{1,1,1,0,0,0},{0,0,1,1,1,0},{0,0,1,1,0,0},{0,0,1,1,1,0}};
-    int numIterations = 7000;
+    int numIterations = 6000;
 
     std::cout << "RBM trained on multiple user's movie preferences" << std::endl;
     RBM model(input);
