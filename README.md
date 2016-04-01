@@ -102,13 +102,17 @@ Deploy app on iPhone for Bluetooth earbuds
 
    http://papers.nips.cc/paper/3674-unsupervised-feature-learning-for-audio-classification-using-convolutional-deep-belief-networks.pdf
    
-   Montreal paper on music genre classification, after feature learning with CDBN
-   
-   http://ismir2010.ismir.net/proceedings/ismir2010-58.pdf
-
    RBM implementation in Python
 
    https://github.com/echen/restricted-boltzmann-machines
+   
+   Overview of RBM and techniques under the hood
+   
+   http://image.diku.dk/igel/paper/AItRBM-proof.pdf
+   
+   Montreal paper on music genre classification, after feature learning with CDBN
+   
+   http://ismir2010.ismir.net/proceedings/ismir2010-58.pdf
 
    DARPA Mechanical Turk Case Study for Arabic translation
    
