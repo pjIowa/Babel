@@ -106,7 +106,7 @@ Deploy app on iPhone for Bluetooth earbuds
 
    https://github.com/echen/restricted-boltzmann-machines
    
-   Overview of RBM and techniques under the hood
+   An Introduction to Restricted Boltzmann Machines, pseudocode and explanation of use and limitations
    
    http://image.diku.dk/igel/paper/AItRBM-proof.pdf
    
