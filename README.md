@@ -70,17 +70,9 @@ Restricted Boltzmann Machine (RBM) ✓
 
 ![rbm loss and test](screenshots/rbm.png)
 
-Auto Encoder
-
-Convolutional Neural Net (CNN)
-   
-Convolutional Deep Belief Network (CDBN)
-
 Lexicon of french phrases to english phrases
    
 Audio files of french phrases from Mac say tool
-   
-Features learned using french phrase audio and CDBN
    
 Classification model
    
