@@ -70,6 +70,8 @@ Restricted Boltzmann Machine (RBM) ✓
 
 ![rbm loss and test](screenshots/rbm.png)
 
+Auto Encoder
+
 Convolutional Neural Net (CNN)
    
 Convolutional Deep Belief Network (CDBN)
