@@ -5,7 +5,7 @@
 #include <ctime>
 #include <armadillo>
 
-class Neuron {
+class Layer {
     arma::mat sigmoid(arma::mat x) {
         return 1.0 / (1.0 + exp(-1.0*x));
     }
@@ -16,11 +16,11 @@ class Neuron {
     arma::umat positiveHiddenStates;
     arma::mat positiveAssociations, negativeAssociations;
 
-    Neuron() {
+    Layer() {
         weights.randu(1, 1);
     }
 
-    Neuron(int neuronCount, int inputsPerNeuron) {
+    Layer(int neuronCount, int inputsPerNeuron) {
         arma::arma_rng::set_seed(1);
         weights.randn(inputsPerNeuron, neuronCount);
         weights *= 0.1;
@@ -53,7 +53,7 @@ class Neuron {
 
 class RBM {
     arma::mat input;
-    Neuron L1;
+    Layer L1;
     int L1NodeCount = 2;
     double learningRate = 0.0005;
     double exampleCount;
@@ -63,7 +63,7 @@ class RBM {
     }
 
     void randomInitWeights(int visibleNodeCount) {
-        L1 = Neuron(L1NodeCount, visibleNodeCount);
+        L1 = Layer(L1NodeCount, visibleNodeCount);
     }
 
     public:
