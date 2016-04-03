@@ -5,6 +5,8 @@
 #include <ctime>
 #include <armadillo>
 
+void plotData(std::vector<double> data);
+
 class Layer {
     arma::mat sigmoid(arma::mat x) {
         return 1.0 / (1.0 + exp(-1.0*x));
@@ -97,6 +99,26 @@ class RBM {
     }
 };
 
+void plotData(std::vector<double> data) {
+    FILE *pipe = popen("gnuplot -persist" , "w");
+
+    if (pipe != NULL) {
+
+        fprintf(pipe, "set style line 5 lt rgb 'cyan' lw 3 pt 6 \n");
+        fprintf(pipe, "plot '-' with linespoints ls 5 \n");
+
+        for (int i=0; i<data.size(); i++) {
+            fprintf(pipe, "%lf %lf\n", double(i), data[i]);
+        }
+        fprintf(pipe, "e");
+
+        fflush(pipe);
+        pclose(pipe);
+    }
+    else {
+        std::cout << "Could not open gnuplot pipe" << std::endl;
+    }
+}
 
 int main() {
     arma::mat input = {{1,1,1,0,0,0},{1,0,1,0,0,0},{1,1,1,0,0,0},{0,0,1,1,1,0},{0,0,1,1,0,0},{0,0,1,1,1,0}};
