@@ -1,6 +1,7 @@
 import os
+from string import punctuation
 
 with open('fra.txt') as f:
     for line in f:
-        i = line.replace("\n", "")
-        os.system('say -o %s.wave -v thomas %s ' % (i, i))
+        i = ''.join(c for c in line if c not in punctuation).strip()
+        os.system('say -v thomas %s -o "%s.wave"' % (i, i))
