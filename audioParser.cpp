@@ -4,7 +4,7 @@ int main (void) {
     std::clock_t startTime;
     AudioParser parser = AudioParser();
     startTime = std::clock();
-    parser.readWaveFile("440_sine.wav");
+    parser.readWaveFile("bonjour.wav");
     std::cout << "File Read Time: " << (std::clock() - startTime) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl << std::endl;
 
     long fftLength = 1024;
