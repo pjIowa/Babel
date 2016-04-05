@@ -13,10 +13,5 @@ int main (void) {
     parser.parseFrequencyStrengths(overlap, fftLength);
     std::cout << "FFT Time: " << (std::clock() - startTime) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl << std::endl;
 
-    bool smoothFlag = false;
-    startTime = std::clock();
-    parser.plotSpectrogram(smoothFlag);
-    std::cout << "Plotting Time: " << (std::clock() - startTime) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl << std::endl;
-
     return 0;
 }

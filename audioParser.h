@@ -2,20 +2,14 @@
 #define __AUDIOPARSER_H__
 #include <sndfile.hh>
 #include <armadillo>
-#include <utility>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <cmath>
-#include <math.h>
 #define PI 3.14159265
 
 class AudioParser {
+    public:
     arma::mat buffer;
     SF_INFO soundInfo;
     arma::cube frequencyMatrix;
 
-    public:
     AudioParser() {
         buffer.zeros(1, 1);
         frequencyMatrix.zeros(1, 1, 1);
