@@ -70,6 +70,8 @@ Restricted Boltzmann Machine (RBM) ✓
 
 ![rbm loss and test](screenshots/rbm.png)
 
+Sequence Learning Algorithms
+
 Lexicon of french phrases to english phrases
    
 Audio files of french phrases from Mac say tool
