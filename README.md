@@ -70,7 +70,9 @@ Restricted Boltzmann Machine (RBM) ✓
 
 ![rbm loss and test](screenshots/rbm.png)
 
-Sequence Learning Algorithms
+Research Sequence Learning Algorithms for Variable Input Length -> Variable Output Length
+
+Viterbi algorithm
 
 Lexicon of french phrases to english phrases
    
