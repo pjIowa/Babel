@@ -1,4 +1,5 @@
-#include <iostream>
+#ifndef __NEURALNET_H__
+#define __NEURALNET_H__
 #include <vector>
 #include <string>
 #include <math.h>
@@ -18,8 +19,6 @@ class Neuron {
     Neuron(int neuronCount, int inputsPerNeuron) {
         arma::arma_rng::set_seed(1);
         weights.randu(inputsPerNeuron, neuronCount);
-        weights.elem( find(weights > 1.0) ).ones();
-        weights.elem( find(weights < -1.0) ).fill(-1.0);
     }
 
     arma::mat calculateOutput(arma::mat i) {
@@ -52,7 +51,7 @@ class NeuralNetwork {
 
     NeuralNetwork(arma::mat i, arma::mat t) {
         input = i;
-        target = t;
+        target = t.t();
         randomInitWeights();
     }
 
@@ -80,14 +79,4 @@ class NeuralNetwork {
     }
 };
 
-
-int main() {
-    arma::mat input = {{0, 0, 1}, {0, 1, 1}, {1, 0, 1}, {0, 1, 0}, {1, 0, 0}, {1, 1, 1}, {0, 0, 0}};
-    arma::mat target = {{0, 1, 1, 1, 1, 0, 0}};
-    int numIterations = 60000;
-
-    std::cout << "Neural Network trained on XOR examples" << std::endl;
-    NeuralNetwork model(input, target.t());
-    model.train(numIterations);
-    return 0;
-}
+#endif
