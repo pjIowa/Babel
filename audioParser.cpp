@@ -12,6 +12,5 @@ int main (void) {
     startTime = std::clock();
     parser.parseFrequencyStrengths(overlap, fftLength);
     std::cout << "FFT Time: " << (std::clock() - startTime) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl << std::endl;
-
     return 0;
 }

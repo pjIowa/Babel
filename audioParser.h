@@ -5,9 +5,12 @@
 #define PI 3.14159265
 
 class AudioParser {
+    bool isBufferCreated = false;
+    bool isFrequencyMatrixCreated = false;
+    SF_INFO soundInfo;
+
     public:
     arma::mat buffer;
-    SF_INFO soundInfo;
     arma::cube frequencyMatrix;
 
     AudioParser() {
@@ -40,13 +43,14 @@ class AudioParser {
                 long column = i % numChannels;
                 buffer(row,column) = tempBuffer[i];
             }
+            isBufferCreated = true;
             sf_close(sndFile);
         }
     }
 
     void parseFrequencyStrengths(double overlap, long fftLength) {
         long numSamples = buffer.n_rows;
-        if (numSamples > 1) {
+        if (isBufferCreated) {
             long numChannels = buffer.n_cols;
 
             double numIntervals = 0;
@@ -111,6 +115,7 @@ class AudioParser {
             //replace -inf with lowest valid value
             double minStrength = frequencyMatrix.elem(find_finite(frequencyMatrix)).min();
             frequencyMatrix.elem( find_nonfinite(frequencyMatrix) ).fill(minStrength);
+            isFrequencyMatrixCreated = true;
         }
         else {
             std::cout << "No audio data available" << std::endl;
@@ -119,7 +124,7 @@ class AudioParser {
 
     void plotSpectrogram(bool smoothGraph) {
         long numIntervals = frequencyMatrix.n_cols;
-        if (numIntervals > 1) {
+        if (isFrequencyMatrixCreated) {
             long frames = soundInfo.frames;
             long samplerate = soundInfo.samplerate;
 
@@ -166,5 +171,33 @@ class AudioParser {
             std::cout << "No frequency strengths available" << std::endl;
         }
     }
+
+    double durationInSeconds() {
+        if (isBufferCreated) {
+            return soundInfo.frames / ((double) soundInfo.samplerate);
+        }
+        else {
+            return 0;
+        }
+    }
+
+    long numberOfFrames() {
+        if (isBufferCreated) {
+            return soundInfo.frames;
+        }
+        else {
+            return 0;
+        }
+    }
+
+    long sampleRate() {
+        if (isBufferCreated) {
+            return soundInfo.samplerate;
+        }
+        else {
+            return 0;
+        }
+    }
+
 };
 #endif
