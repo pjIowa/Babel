@@ -6,16 +6,15 @@
 
 class AudioParser {
     bool isBufferCreated = false;
-    bool isFrequencyMatrixCreated = false;
+    bool isFrequencyMappingCreated = false;
     SF_INFO soundInfo;
 
     public:
     arma::mat buffer;
-    arma::cube frequencyMatrix;
+    std::vector<arma::mat> frequencyMapping;
 
     AudioParser() {
         buffer.zeros(1, 1);
-        frequencyMatrix.zeros(1, 1, 1);
     }
 
     void readWaveFile(std::string fileName) {
@@ -49,8 +48,8 @@ class AudioParser {
     }
 
     void parseFrequencyStrengths(double overlap, long fftLength) {
-        long numSamples = buffer.n_rows;
         if (isBufferCreated) {
+            long numSamples = buffer.n_rows;
             long numChannels = buffer.n_cols;
 
             double numIntervals = 0;
@@ -63,7 +62,10 @@ class AudioParser {
             long numSamplesOverlap = fftLength*overlap;
             long validFFTLength = fftLength/2;
 
-            frequencyMatrix.zeros(numChannels, numIntervals, validFFTLength);
+            for (int i=0; i<numChannels; i++) {
+                arma::mat channelMat(numIntervals, validFFTLength, arma::fill::zeros);
+                frequencyMapping.push_back(channelMat);
+            }
 
             for(double j=0; j<numIntervals; j++) {
                 long startIndex = j*numSamplesOverlap;
@@ -106,16 +108,19 @@ class AudioParser {
                     //converts magnitude to dB scale
                     magnitudeChunk = 20.0*log10(magnitudeChunk);
 
+                    //replace -inf with lowest valid value
+                    double minStrength = magnitudeChunk.elem(find_finite(magnitudeChunk)).min();
+                    magnitudeChunk.elem( find_nonfinite(magnitudeChunk) ).fill(minStrength);
+
+                    //i - channel, j - interval, k - frequency bin
+
                     for (double k=0; k<validFFTLength; k++) {
-                        frequencyMatrix(i, j, k) = magnitudeChunk(k);
+                        frequencyMapping[i](j, k) = magnitudeChunk(k);
                     }
                 }
             }
 
-            //replace -inf with lowest valid value
-            double minStrength = frequencyMatrix.elem(find_finite(frequencyMatrix)).min();
-            frequencyMatrix.elem( find_nonfinite(frequencyMatrix) ).fill(minStrength);
-            isFrequencyMatrixCreated = true;
+            isFrequencyMappingCreated = true;
         }
         else {
             std::cout << "No audio data available" << std::endl;
@@ -123,8 +128,7 @@ class AudioParser {
     }
 
     void plotSpectrogram(bool smoothGraph) {
-        long numIntervals = frequencyMatrix.n_cols;
-        if (isFrequencyMatrixCreated) {
+        if (isFrequencyMappingCreated) {
             long frames = soundInfo.frames;
             long samplerate = soundInfo.samplerate;
 
@@ -135,9 +139,8 @@ class AudioParser {
                 double duration = (double) frames/samplerate;
                 double maxFrequency = samplerate/2.0;
                 int axisFontSize = 12;
-                long numChannels = frequencyMatrix.n_rows;
-                long numIntervals = frequencyMatrix.n_cols;
-                long numFrequencyBins = frequencyMatrix.n_slices;
+                long numIntervals = frequencyMapping[0].n_rows;
+                long numFrequencyBins = frequencyMapping[0].n_cols;
 
                 fprintf(pipe, "set view map\n");
                 fprintf(pipe, "set dgrid3d\n");
@@ -150,12 +153,12 @@ class AudioParser {
                 fprintf(pipe, "set xr [0:%f]\n", duration);
                 fprintf(pipe, "splot '-' with pm3d \n");
 
-                fprintf(pipe, "%f %d %f\n", 0.0, 0, frequencyMatrix.min());
+                fprintf(pipe, "%f %d %f\n", 0.0, 0, frequencyMapping[0].min());
                 for (long i=0; i<numIntervals; i++) {
                     double timePoint = (double) (i+1)/numIntervals*duration;
                     for (long j=0; j<numFrequencyBins; j++) {
                         double frequency = (double) j/numFrequencyBins*maxFrequency;
-                        fprintf(pipe, "%f %f %f\n", timePoint, frequency, frequencyMatrix(0, i, j));
+                        fprintf(pipe, "%f %f %f\n", timePoint, frequency, frequencyMapping[0](i, j));
                     }
                 }
                 fprintf(pipe, "e");
