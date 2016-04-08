@@ -127,6 +127,10 @@ class AudioParser {
         }
     }
 
+    void compressFrequencyStrengths() {
+        //TODO: use autoencoder to compress into finite set of neurons
+    }
+
     void plotSpectrogram(bool smoothGraph) {
         if (isFrequencyMappingCreated) {
             long frames = soundInfo.frames;
