@@ -44,7 +44,7 @@ FFTW
 ```
 
 ## Roadmap
-Logistic regression with gradient descent ✓
+Simple logistic regression with gradient descent ✓
    
 ![logistic regression loss](screenshots/logistic_regression.png)
    
@@ -62,23 +62,23 @@ Spectrogram ✓
 
 ![128 spectrogram](screenshots/128_raw.png)
    
-1 hidden layer neural network ✓
+Simple 1 hidden layer neural network ✓
 
 ![neural net loss](screenshots/h1_neural_net.png)
-   
-Restricted Boltzmann Machine (RBM) ✓
 
-![rbm loss and test](screenshots/rbm.png)
+Lexicon of french phrases to english phrases ✓
 
-Recurrent Neural Net (RNN)
+Simple recurrent neural network (RNN)
 
-Lexicon of french phrases to english phrases
+Use RNN to create fixed-length feature vector from variable-length audio
+
+Research how to train for variable length output
    
-Audio files of french phrases from Mac say tool
-   
-Classification model
-   
-Train model
+Audio files of all french phrases from Mac say tool
+
+Create lookup for output sequence
+
+Train algorithm
    
 Deploy app on iPhone for Bluetooth earbuds
 
@@ -91,7 +91,7 @@ Deploy app on iPhone for Bluetooth earbuds
    
    http://marsyasweb.appspot.com/download/data_sets/ , files vs. music genre
    
-   http://www.manythings.org/bilingual/ , translation corpus for english vs. other other languages
+   http://www.manythings.org/bilingual/ , translation corpus for english vs. other other languages ✓
 
 ## References:
    Andrew Ng paper on speech classification, after feature learning with CDBN
