@@ -9,13 +9,12 @@ Licensed under the [MIT License](https://opensource.org/licenses/MIT)
 brew install armadillo
 brew install libsndfile
 brew install gnuplot --with-qt
-brew install fftw
 ```
 
 ## Build Code
 
 ```
-g++ file.cpp -o file.o -std=c++11
+g++ file.cpp -o file -std=c++11
 ```
 
 ## Build Flags for Libraries
@@ -32,15 +31,9 @@ Libsndfile
 -lsndfile
 ```
 
-FFTW
-
-```
--lfftw3
-```
-
 ## Run Code
 ```
-./file.o
+./file
 ```
 
 ## Roadmap
