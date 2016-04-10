@@ -5,18 +5,18 @@
 #include <math.h>
 #include <armadillo>
 
-class Neuron {
+class Layer {
     arma::mat sigmoid(arma::mat x) {
         return 1.0 / (1.0 + arma::exp(-1.0*x));
     }
 
     public:
     arma::mat weights;
-    Neuron() {
+    Layer() {
         weights.randu(1, 1);
     }
 
-    Neuron(int neuronCount, int inputsPerNeuron) {
+    Layer(int neuronCount, int inputsPerNeuron) {
         arma::arma_rng::set_seed(1);
         weights.randu(inputsPerNeuron, neuronCount);
     }
@@ -29,8 +29,8 @@ class Neuron {
 class NeuralNetwork {
     arma::mat input;
     arma::mat target;
-    Neuron L1;
-    Neuron L2;
+    Layer L1;
+    Layer L2;
     int L1NodeCount = 4;
 
     arma::mat sigmoid_derivative(arma::mat x) {
@@ -38,8 +38,8 @@ class NeuralNetwork {
     }
 
     void randomInitWeights() {
-        L1 = Neuron(L1NodeCount, input.n_cols);
-        L2 = Neuron(target.n_cols, L1NodeCount);
+        L1 = Layer(L1NodeCount, input.n_cols);
+        L2 = Layer(target.n_cols, L1NodeCount);
     }
 
     public:
@@ -62,9 +62,6 @@ class NeuralNetwork {
             arma::mat L2Output = layerOutputs[1];
 
             arma::mat L2Error = target-L2Output;
-            if (i%6000==0) {
-                std::cout << "Step " << i << ": " << sum(L2Error, 0) << std::endl;
-            }
             arma::mat L2Delta = L2Error%sigmoid_derivative(L2Output);
 
             arma::mat L1Error = L2Delta*L2.weights.t();
@@ -75,6 +72,10 @@ class NeuralNetwork {
 
             L1.weights += L1Adjustment;
             L2.weights += L2Adjustment;
+            
+            if (i%6000==0) {
+                std::cout << "Step " << i << ": " << sum(L2Error, 0) << std::endl;
+            }
         }
     }
 };
