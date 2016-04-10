@@ -17,7 +17,7 @@ brew install gnuplot --with-qt
 g++ file.cpp -o file -std=c++11
 ```
 
-## Build Flags for Libraries
+### Add Flags to use Libraries
 
 Armadillo
 
