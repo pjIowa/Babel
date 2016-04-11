@@ -3,7 +3,7 @@ End Goal: iPhone app to translate a foreign language in real-time
 
 Licensed under the [MIT License](https://opensource.org/licenses/MIT)
 
-## Install Libaries
+### Install Libaries
 
 ```
 brew install armadillo
@@ -11,13 +11,13 @@ brew install libsndfile
 brew install gnuplot --with-qt
 ```
 
-## Build Code
+### Build Code
 
 ```
 g++ file.cpp -o file -std=c++11
 ```
 
-## Build Flags for Libraries
+### Add Flags to use Libraries
 
 Armadillo
 
@@ -31,12 +31,12 @@ Libsndfile
 -lsndfile
 ```
 
-## Run Code
+### Run Code
 ```
 ./file
 ```
 
-## Roadmap
+# Roadmap
 Simple logistic regression with gradient descent ✓
    
 ![logistic regression loss](screenshots/logistic_regression.png)
