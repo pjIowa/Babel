@@ -87,9 +87,13 @@ Deploy app on iPhone for Bluetooth earbuds
    http://www.manythings.org/bilingual/ , translation corpus for english vs. other other languages ✓
 
 ## References:
-   Andrew Ng paper on speech classification, after feature learning with CDBN
+   Andrew Ng paper on speech classification
 
    http://papers.nips.cc/paper/3674-unsupervised-feature-learning-for-audio-classification-using-convolutional-deep-belief-networks.pdf
+   
+   RNN implentation in Python
+   
+   http://peterroelants.github.io/posts/rnn_implementation_part01/
    
    RBM implementation in Python
 
@@ -99,11 +103,11 @@ Deploy app on iPhone for Bluetooth earbuds
    
    http://image.diku.dk/igel/paper/AItRBM-proof.pdf
    
-   Montreal paper on music genre classification, after feature learning with CDBN
+   Montreal paper on music genre classification
    
    http://ismir2010.ismir.net/proceedings/ismir2010-58.pdf
 
-   DARPA Mechanical Turk Case Study for Arabic translation
+   DARPA Case Study for Arabic translation
    
    https://requester.mturk.com/case_studies/cs/darpa
    
