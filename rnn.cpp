@@ -1,8 +1,10 @@
 #include "rnn.h"
 
 int main (void) {
-    arma::mat input =  {0, 0, 1, 1, 0};
-    arma::mat target =  {0, 0, 1, 0, 1};
+    int sequenceLength = 10;
+    int numberOfSequences = 20;
+    arma::mat input = round(arma::randu<arma::mat>(numberOfSequences, sequenceLength));
+    arma::mat target =  sum(input, 1);
     
     RecurrentNeuralNetwork model(input, target);
     model.train(5000);
