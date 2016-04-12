@@ -3,6 +3,7 @@
 #include <armadillo>
 
 class RecurrentNeuralNetwork {
+    //TODO: separate weights into input and context weights
     arma::mat weights;
     arma::mat weightDeltas;
     arma::mat previousWeightSigns;
@@ -50,10 +51,21 @@ class RecurrentNeuralNetwork {
         return 2.0 * (prediction - target) / target.n_rows;
     }
     
-    void backwardGradient() {
-        //take the input, context for all time steps, output gradient, and context weight
-        //go backwards through all time steps
-        //return gradient update for input and context weights
+    //take context for all time steps, output gradient, and context weight
+    //return gradient update for input and context weights
+    std::vector<arma::mat> backwardGradient(arma::mat context, arma::mat gradientOutput, arma::mat contextWeights) {
+        arma::mat gradientOverTime = arma::zeros<arma::mat>(input.n_rows, input.n_cols + 1);
+        gradientOverTime.col(gradientOverTime.n_cols-1) = gradientOutput;
+        //TODO: generalize
+        arma::mat inputGradient = { 0 };
+        arma::mat contextGradient = { 0 };
+        
+        for(int i=input.n_cols; i>0; i--) {
+            inputGradient += sum(gradientOverTime.col(i)%input.col(i-1));
+            contextGradient += sum(gradientOverTime.col(i)%context.col(i-1));
+            gradientOverTime.col(i-1) = gradientOverTime.col(i)*contextWeights;
+        }
+        return std::vector<arma::mat> { inputGradient, contextGradient };
     }
     
     void resilientPropagationUpdate() {
@@ -62,7 +74,7 @@ class RecurrentNeuralNetwork {
         
         arma::mat context = forwardStep(inputWeights, contextWeights);
         arma::mat gradientOutput = outputGradient(context.col(context.n_cols-1));
-        backwardGradient();
+        std::vector<arma::mat> weightGradients = backwardGradient(context, gradientOutput, contextWeights);
         //get sign of weight gradients
         for(int i=0; i<weights.n_cols; i++) {
             //if new weight sign is same as previous weight sign
@@ -85,6 +97,7 @@ class RecurrentNeuralNetwork {
         input = i;
         target = t;
         randomInitWeights();
+        //TODO: generalize
         weightDeltas = {0.001, 0.001};
         previousWeightSigns = {0, 0};
     } 
