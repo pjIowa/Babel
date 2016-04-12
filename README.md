@@ -67,11 +67,19 @@ Long Short Term Memory (LSTM)
 
 Audio files of all french phrases from Mac say tool
 
-Use LSTM to predict number of words
-
 Create lookup for output sequence
 
-Use LSTM to predict output sequence in English
+Either:
+
+predict number of words then
+
+predict output sequence in English
+
+Or:
+
+predict sequences of different lengths then
+
+output sequence with highest probability
 
 Train algorithm
    
