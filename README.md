@@ -63,13 +63,15 @@ Lexicon of french phrases to english phrases ✓
 
 Simple recurrent neural network (RNN)
 
-Use RNN to create fixed-length feature vector from variable-length audio
+Long Short Term Memory (LSTM)
 
-Research how to train for variable length output
-   
 Audio files of all french phrases from Mac say tool
 
+Use LSTM to predict number of words
+
 Create lookup for output sequence
+
+Use LSTM to predict output sequence in English
 
 Train algorithm
    
