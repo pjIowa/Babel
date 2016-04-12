@@ -27,14 +27,27 @@ class RecurrentNeuralNetwork {
         weights.randn(1, 2);
     }
     
-    void forwardStep() {
-        //take input, inputweight, and contextweight
-        //combine and return context for each time step
+    //return context for each time step
+    arma::mat forwardStep(arma::mat inputWeights, arma::mat contextWeights) {
+        arma::mat context = arma::zeros<arma::mat>(input.n_rows, input.n_cols + 1);
+        
+        for(int i=0; i<input.n_cols; i++) {
+            context.col(i+1) = updateContext(input.col(i), context.col(i), inputWeights, contextWeights);
+        }
+        
+        return context;
     }
     
-    void outputGradient() {
-        //take context of last time step and target
-        //return gradient update for the output weights
+    //take input for time step, previous context, input weights, and context weights
+    //return new context
+    arma::mat updateContext(arma::mat examplesForTimeStep, arma::mat previousContext, arma::mat inputWeights, arma::mat contextWeights) {
+        return examplesForTimeStep*inputWeights + previousContext*contextWeights;
+    }
+    
+    //take context of last time step (prediction)
+    //return gradient update for output weights
+    arma::mat outputGradient(arma::mat prediction) {
+        return 2.0 * (prediction - target) / target.n_rows;
     }
     
     void backwardGradient() {
@@ -44,8 +57,11 @@ class RecurrentNeuralNetwork {
     }
     
     void resilientPropagationUpdate() {
-        forwardStep();
-        outputGradient();
+        arma::mat inputWeights = weights.col(0);
+        arma::mat contextWeights = weights.col(1);
+        
+        arma::mat context = forwardStep(inputWeights, contextWeights);
+        arma::mat gradientOutput = outputGradient(context.col(context.n_cols-1));
         backwardGradient();
         //get sign of weight gradients
         for(int i=0; i<weights.n_cols; i++) {
@@ -74,9 +90,7 @@ class RecurrentNeuralNetwork {
     } 
     
     void train(int numIt) {
-        
         resilientPropagationUpdate();
-        
 //        for(int i=0; i<numIt; i++) {
 //            
 //        }
