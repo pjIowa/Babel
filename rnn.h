@@ -3,10 +3,11 @@
 #include <armadillo>
 
 class RecurrentNeuralNetwork {
+    int numContextStates = 1;
     arma::mat inputWeights;
     arma::mat contextWeights;
     
-    arma::mat inputWeightDeltas;
+    arma::mat inputWeightDelta;
     arma::mat contextWeightDeltas;
     
     arma::mat previousInputWeightSigns;
@@ -29,14 +30,26 @@ class RecurrentNeuralNetwork {
     
     void randomInitWeights() {
         arma::arma_rng::set_seed(1);
-        //TODO: make sizes dynamic
         inputWeights.randn(1, 1);
-        contextWeights.randn(1, 1);
+        contextWeights.randn(1, numContextStates);
     }
     
     //take input for time step, previous context, input weights, and context weights
     //return new context
     arma::mat updateContext(arma::mat examplesForTimeStep, arma::mat previousContext, arma::mat inputWeights, arma::mat contextWeights) {
+//        std::cout << size(examplesForTimeStep) << std::endl;
+//        std::cout << size(inputWeights) << std::endl;
+//        std::cout << size(previousContext) << std::endl;
+//        std::cout << size(contextWeights) << std::endl;
+//        20x1 
+//        1x1
+//        20x1
+//        1x2
+//        W_hh*h + W_xh*x
+        //20x20*20x2 + 20x1*1x2 = 20x2 
+        //2x20*20x20 + 2x1*1x20 = 2x20 
+        
+        //20x1*1x1 + 20x1*1x2 
         return examplesForTimeStep*inputWeights + previousContext*contextWeights;
     }
     
@@ -51,9 +64,8 @@ class RecurrentNeuralNetwork {
     std::vector<arma::mat> backwardGradient(arma::mat context, arma::mat gradientOutput) {
         arma::mat gradientOverTime = arma::zeros<arma::mat>(input.n_rows, input.n_cols + 1);
         gradientOverTime.col(gradientOverTime.n_cols-1) = gradientOutput;
-        //TODO: make sizes dynamic
         arma::mat inputGradient = { 0 };
-        arma::mat contextGradient = { 0 };
+        arma::mat contextGradient = arma::zeros<arma::mat>(1, numContextStates);
         
         for(int i=input.n_cols; i>0; i--) {
             inputGradient += sum(gradientOverTime.col(i)%input.col(i-1));
@@ -80,15 +92,15 @@ class RecurrentNeuralNetwork {
         arma::mat contextGradientSigns = weightGradientSigns[1];
         
         //Update magnitude of weight changes
-        inputWeightDeltas.elem( find(inputGradientSigns == previousInputWeightSigns) )*etaP;
-        inputWeightDeltas.elem( find(inputGradientSigns != previousInputWeightSigns) )*etaN;
+        inputWeightDelta.elem( find(inputGradientSigns == previousInputWeightSigns) )*etaP;
+        inputWeightDelta.elem( find(inputGradientSigns != previousInputWeightSigns) )*etaN;
         contextWeightDeltas.elem( find(contextGradientSigns == previousContextWeightSigns) )*etaP;
         contextWeightDeltas.elem( find(contextGradientSigns != previousContextWeightSigns) )*etaN;
         previousInputWeightSigns = inputGradientSigns;
         previousContextWeightSigns = contextGradientSigns;
         
         //Update weights
-        inputWeights -= inputGradientSigns%inputWeightDeltas;
+        inputWeights -= inputGradientSigns%inputWeightDelta;
         contextWeights -= contextGradientSigns%contextWeightDeltas;
         
         return accu(gradientOutput);
@@ -104,13 +116,14 @@ class RecurrentNeuralNetwork {
         randomInitWeights();
         
         //TODO: make sizes dynamic
-        inputWeightDeltas = {0.001};
-        contextWeightDeltas = {0.001};
+        inputWeightDelta = {0.001};
+        contextWeightDeltas.set_size(1, numContextStates);
+        contextWeightDeltas.fill(0.001);
         previousInputWeightSigns = {0};
-        previousContextWeightSigns = {0};
+        previousContextWeightSigns.zeros(1, numContextStates);
     } 
     
-        //return context for each time step
+    //return context for each time step
     arma::mat forwardStep() {
         arma::mat context = arma::zeros<arma::mat>(input.n_rows, input.n_cols + 1);
         for(int i=0; i<input.n_cols; i++) {
