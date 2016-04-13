@@ -61,7 +61,11 @@ Simple 1 hidden layer neural network ✓
 
 Lexicon of french phrases to english phrases ✓
 
-Simple recurrent neural network (RNN)
+Simple recurrent neural network (RNN) ✓
+
+![recurrent neural net loss](screenshots/rnn_loss.png)
+
+RNN with non-linear activations
 
 Long Short Term Memory (LSTM)
 
