@@ -3,9 +3,10 @@
 #include <armadillo>
 
 class RecurrentNeuralNetwork {
-    int numContextStates = 1;
+    int numContextStates = 2;
     arma::mat inputWeights;
     arma::mat contextWeights;
+    arma::mat outputWeights;
     
     arma::mat inputWeightDelta;
     arma::mat contextWeightDeltas;
@@ -30,8 +31,9 @@ class RecurrentNeuralNetwork {
     
     void randomInitWeights() {
         arma::arma_rng::set_seed(1);
-        inputWeights.randn(1, 1);
-        contextWeights.randn(1, numContextStates);
+        inputWeights.randn(1, numContextStates);
+        contextWeights.randn(numContextStates, numContextStates);
+        outputWeights.randn(numContextStates, target.n_cols);
     }
     
     //take input for time step, previous context, input weights, and context weights
@@ -41,15 +43,8 @@ class RecurrentNeuralNetwork {
 //        std::cout << size(inputWeights) << std::endl;
 //        std::cout << size(previousContext) << std::endl;
 //        std::cout << size(contextWeights) << std::endl;
-//        20x1 
-//        1x1
-//        20x1
-//        1x2
-//        W_hh*h + W_xh*x
-        //20x20*20x2 + 20x1*1x2 = 20x2 
-        //2x20*20x20 + 2x1*1x20 = 2x20 
-        
-        //20x1*1x1 + 20x1*1x2 
+//        x*W_xh+ h*W_hh
+//        20x1*1x2+20x2*2x2 = 20x2
         return examplesForTimeStep*inputWeights + previousContext*contextWeights;
     }
     
@@ -61,15 +56,24 @@ class RecurrentNeuralNetwork {
     
     //take context for all time steps, output gradient, and context weight
     //return gradient update for input and context weights
-    std::vector<arma::mat> backwardGradient(arma::mat context, arma::mat gradientOutput) {
-        arma::mat gradientOverTime = arma::zeros<arma::mat>(input.n_rows, input.n_cols + 1);
+    std::vector<arma::mat> backwardGradient(std::vector<arma::mat> context, arma::mat gradientOutput) {
+        
+        std::vector<arma::mat> gOT;
+        gOT.reserve(input.n_cols+1);
+        gOT.back() = gradientOutput;
+        
+        arma::mat gradientOverTime  = arma::zeros<arma::mat>(input.n_rows, input.n_cols + 1);
         gradientOverTime.col(gradientOverTime.n_cols-1) = gradientOutput;
         arma::mat inputGradient = { 0 };
         arma::mat contextGradient = arma::zeros<arma::mat>(1, numContextStates);
         
         for(int i=input.n_cols; i>0; i--) {
+            std::cout << size(gradientOverTime.col(i)) << std::endl;
+            std::cout << size(input.col(i-1)) << std::endl;
+            std::cout << size(context[i-1]) << std::endl;
+            std::cout << size(contextWeights) << std::endl;
             inputGradient += sum(gradientOverTime.col(i)%input.col(i-1));
-            contextGradient += sum(gradientOverTime.col(i)%context.col(i-1));
+            contextGradient += sum(gradientOverTime.col(i)%context[i-1]);
             gradientOverTime.col(i-1) = gradientOverTime.col(i)*contextWeights;
         }
         return std::vector<arma::mat> { inputGradient, contextGradient };
@@ -77,8 +81,12 @@ class RecurrentNeuralNetwork {
     
     double resilientPropagationUpdate() {
         //Forward calculations
-        arma::mat context = forwardStep();
-        arma::mat gradientOutput = outputGradient(context.col(context.n_cols-1));
+        std::vector<arma::mat> context = forwardStep();
+//        std::cout << size(context.back()) << std::endl;
+//        std::cout << size(outputWeights) << std::endl;
+//        std::cout << size(target) << std::endl;
+        arma::mat gradientOutput = outputGradient(context.back()*outputWeights);
+//        std::cout << gradientOutput << std::endl;
         
         //Backward calculations
         std::vector<arma::mat> weightGradients = backwardGradient(context, gradientOutput);
@@ -124,12 +132,13 @@ class RecurrentNeuralNetwork {
     } 
     
     //return context for each time step
-    arma::mat forwardStep() {
-        arma::mat context = arma::zeros<arma::mat>(input.n_rows, input.n_cols + 1);
+    std::vector<arma::mat> forwardStep() {
+        std::vector<arma::mat> ctx;
+        ctx.push_back(arma::zeros<arma::mat>(input.n_rows, numContextStates));
         for(int i=0; i<input.n_cols; i++) {
-            context.col(i+1) = updateContext(input.col(i), context.col(i), inputWeights, contextWeights);
+            ctx.push_back(updateContext(input.col(i), ctx[i], inputWeights, contextWeights));
         }
-        return context;
+        return ctx;
     }
     
     std::vector<double> train(int numIt) {
