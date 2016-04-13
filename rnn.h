@@ -15,17 +15,17 @@ class RecurrentNeuralNetwork {
     double etaP = 1.2;
     double etaN = 0.5;
     
-    arma::mat sigmoid_derivative(arma::mat x) {
-        return x % (1-x);
-    }
-    
-    arma::mat sigmoid(arma::mat x) {
-        return 1.0 / (1.0 + arma::exp(-1.0*x));
-    }
-    
-    arma::mat activate(arma::mat a, arma::mat b) {
-        return sigmoid(a*b);
-    }
+//    arma::mat sigmoid_derivative(arma::mat x) {
+//        return x % (1-x);
+//    }
+//    
+//    arma::mat sigmoid(arma::mat x) {
+//        return 1.0 / (1.0 + arma::exp(-1.0*x));
+//    }
+//    
+//    arma::mat activate(arma::mat a, arma::mat b) {
+//        return sigmoid(a*b);
+//    }
     
     void randomInitWeights() {
         arma::arma_rng::set_seed(1);
@@ -63,7 +63,7 @@ class RecurrentNeuralNetwork {
         return std::vector<arma::mat> { inputGradient, contextGradient };
     }
     
-    void resilientPropagationUpdate() {
+    double resilientPropagationUpdate() {
         //Forward calculations
         arma::mat context = forwardStep();
         arma::mat gradientOutput = outputGradient(context.col(context.n_cols-1));
@@ -90,6 +90,8 @@ class RecurrentNeuralNetwork {
         //Update weights
         inputWeights -= inputGradientSigns%inputWeightDeltas;
         contextWeights -= contextGradientSigns%contextWeightDeltas;
+        
+        return accu(gradientOutput);
     }
     
     public:
@@ -117,10 +119,13 @@ class RecurrentNeuralNetwork {
         return context;
     }
     
-    void train(int numIt) {
+    std::vector<double> train(int numIt) {
+        std::vector<double> costVector;
         for(int i=0; i<numIt; i++) {
-            resilientPropagationUpdate();
+            double cost = resilientPropagationUpdate();
+            costVector.push_back(cost);
         }
+        return costVector;
     }
 };
 #endif

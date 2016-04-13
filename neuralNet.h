@@ -55,7 +55,8 @@ class NeuralNetwork {
         randomInitWeights();
     }
 
-    void train(int numIt) {
+    std::vector<double> train(int numIt) {
+        std::vector<double> costVector;
         for(int i=0; i<numIt; i++) {
             std::vector<arma::mat> layerOutputs = calculateLayerOutputs(input);
             arma::mat L1Output = layerOutputs[0];
@@ -73,10 +74,9 @@ class NeuralNetwork {
             L1.weights += L1Adjustment;
             L2.weights += L2Adjustment;
             
-            if (i%6000==0) {
-                std::cout << "Step " << i << ": " << sum(L2Error, 0) << std::endl;
-            }
+            costVector.push_back(accu(L2Error));
         }
+        return costVector;
     }
 };
 

@@ -4,7 +4,6 @@
 #include <math.h>
 #include <utility>
 
-void plotData(std::vector<double> data);
 class LogisticRegression {
     arma::mat weights;
     double bias;
@@ -61,7 +60,7 @@ class LogisticRegression {
         for(int i=0; i<numIterations; i++) {
             errorList[i] = logitError;
             if (i%1000==0) {
-                std::cout << "Step " << i << " " << logitError << std::endl;
+                std::cout << "Step " << i << "   \t" << logitError << std::endl;
             }
             updateParameters();
             logitError = computeLogitError();
@@ -70,27 +69,6 @@ class LogisticRegression {
         return errorList;
     }
 };
-
-void plotData(std::vector<double> data) {
-    FILE *pipe = popen("gnuplot -persist" , "w");
-
-    if (pipe != NULL) {
-
-        fprintf(pipe, "set style line 5 lt rgb 'cyan' lw 3 pt 6 \n");
-        fprintf(pipe, "plot '-' with linespoints ls 5 \n");
-
-        for (int i=0; i<data.size(); i++) {
-            fprintf(pipe, "%lf %lf\n", double(i), data[i]);
-        }
-        fprintf(pipe, "e");
-
-        fflush(pipe);
-        pclose(pipe);
-    }
-    else {
-        std::cout << "Could not open gnuplot pipe" << std::endl;
-    }
-}
 
 int main() {
     int numIterations = 10000;
@@ -104,10 +82,10 @@ int main() {
     double bias = 0.0;
     double learningRate = 0.001;
 
+    std::cout << std::endl;
     std::cout << "Gradient Descent on " << fileName << std::endl;
     LogisticRegression model(weights, bias, input, target, learningRate, numIterations);
     errorList = model.gradientDescent();
-    plotData(errorList);
 
     fileName = "myopia.csv";
     csvData.load(fileName, arma::csv_ascii);
@@ -120,7 +98,7 @@ int main() {
     std::cout << "Gradient Descent on " << fileName << std::endl;
     model = LogisticRegression(weights, bias, input, target, learningRate, numIterations);
     errorList = model.gradientDescent();
-    plotData(errorList);
+    std::cout << std::endl;
 
     return 0;
 }
