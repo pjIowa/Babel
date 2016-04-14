@@ -1,4 +1,4 @@
-#include "rnn.h"
+#include "rnnGeneral.h"
 
 int main (void) {
     int sequenceLength = 10;

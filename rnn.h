@@ -1,5 +1,5 @@
-#ifndef __AUTOENCODER_H__
-#define __AUTOENCODER_H__
+#ifndef __RNN_H__
+#define __RNN_H__
 #include <armadillo>
 
 class RecurrentNeuralNetwork {
