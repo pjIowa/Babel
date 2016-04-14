@@ -20,12 +20,12 @@ int main (void) {
     std::cout << std::endl;
     
     
-//    arma::mat testInput = {{0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1}};
-//    model.input = testInput;
-//    arma::mat testOutput = model.forwardStep();
-//    std::cout << std::endl;
-//    std::cout << "Expectation on Test Sequence: " << accu(testInput) << std::endl;
-//    std::cout << "Prediction:                   " << as_scalar(testOutput.col(testOutput.n_cols-1)) << std::endl;
-//    std::cout << std::endl;
+    arma::mat testInput = {{0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1}};
+    model.input = testInput;
+    arma::mat testOutput = model.forwardStep();
+    std::cout << std::endl;
+    std::cout << "Expectation on Test Sequence: " << accu(testInput) << std::endl;
+    std::cout << "Prediction:                   " << as_scalar(testOutput.col(testOutput.n_cols-1)) << std::endl;
+    std::cout << std::endl;
     return 0;
 }
