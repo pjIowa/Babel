@@ -39,6 +39,18 @@ class RNN:
     def bptt(self, x, y):
         T = len(x)
         o, s = model.forwardPropagation(xTrain)
+        dLwrtU = np.zeros(self.U.shape)
+        dLwrtV = np.zeros(self.V.shape)
+        dLwrtW = np.zeros(self.W.shape)
+        deltaO = o
+        for t in np.arange(T)[::-1]:
+            dLwrtV += np.outer(deltaO[t], s[t].T)
+            deltaT = self.V.T.dot(deltaO[t])*(1-(s[t]**2))
+            for bpttStep in np.arange(0, t+1)[::-1]:
+                dLwrtW += np.outer(deltaT, s[bpttStep-1])
+                dLwrtU += np.outer(deltaT, x[bpttStep])
+                deltaT = self.W.T.dot(deltaT) * (1 - s[bpttStep-1] ** 2)
+        return [dLwrtU, dLwrtV, dLwrtW]
 
     
 def sumXOR(x):
@@ -71,7 +83,13 @@ yTrain = np.apply_along_axis( sumXOR, axis=1, arr=xTrain )
 
 model = RNN(sequenceLength,outputLength)
 #print "Actual loss: %f" % model.calculateMSE(xTrain, yTrain)
-model.bptt(xTrain, yTrain)
+dU, dV, dW = model.bptt(xTrain, yTrain)
+#print dU.shape
+#print dV.shape
+#print dW.shape
+#print dU
+#print dV
+#print dW
 #o, s = model.forwardPropagation(xTrain[0])
 #print xTrain[0].shape
 #print o.shape
