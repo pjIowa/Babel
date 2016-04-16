@@ -27,14 +27,17 @@ class RNN:
     def calculateTotalSquareError(self, x, y):
         L = 0
         for i in np.arange(len(np.atleast_1d(y))):
-            o, s = self.forwardPropagation(x)
-            L += np.square(o-y)
+            o, s = self.forwardPropagation(x[i])
+            L += np.square(o-y[i])
         return L
  
     def calculateMSE(self, x, y):
-        # Divide the total loss by the number of training examples
         N =  len(np.atleast_1d(y))
         return self.calculateTotalSquareError(x,y)/N
+    
+    def bptt(self, x, y):
+        T = len(x)
+        o, s = model.forwardPropagation(xTrain)
 
     
 def sumXOR(x):
@@ -66,7 +69,8 @@ yTrain = np.apply_along_axis( sumXOR, axis=1, arr=xTrain )
 # v*s_t = 1x2x2x1 = 1
 
 model = RNN(sequenceLength,outputLength)
-print "Actual loss: %f" % model.calculateMSE(xTrain[0], yTrain[0])
+print "Actual loss: %f" % model.calculateMSE(xTrain, yTrain)
+#model.bptt(xTrain, )
 #o, s = model.forwardPropagation(xTrain[0])
 #print xTrain[0].shape
 #print o.shape
