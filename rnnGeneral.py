@@ -13,15 +13,16 @@ class RNN:
     
     def forwardPropagation(self, x):
         T = len(x)
+#        print x[0,:].shape
     
         s = np.zeros((T + 1, self.hDim))
         s[-1] = np.zeros(self.hDim)
         
-        o = np.zeros((T, self.iDim))
+        o = np.zeros((T, self.oDim))
         
         for t in np.arange(T):
-            s[t] = np.tanh(self.U.dot(x) + self.W.dot(s[t-1]))
-            o = self.V.dot(s[t])
+            s[t] = np.tanh(self.U.dot(x[t,:]) + self.W.dot(s[t-1]))
+            o[t] = self.V.dot(s[t])
         return [o, s]
     
     def calculateTotalSquareError(self, x, y):
@@ -69,8 +70,8 @@ yTrain = np.apply_along_axis( sumXOR, axis=1, arr=xTrain )
 # v*s_t = 1x2x2x1 = 1
 
 model = RNN(sequenceLength,outputLength)
-print "Actual loss: %f" % model.calculateMSE(xTrain, yTrain)
-#model.bptt(xTrain, )
+#print "Actual loss: %f" % model.calculateMSE(xTrain, yTrain)
+model.bptt(xTrain, yTrain)
 #o, s = model.forwardPropagation(xTrain[0])
 #print xTrain[0].shape
 #print o.shape
