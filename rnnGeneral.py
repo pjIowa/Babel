@@ -13,7 +13,6 @@ class RNN:
     
     def forwardPropagation(self, x):
         T = len(x)
-#        print x[0,:].shape
     
         s = np.zeros((T + 1, self.hDim))
         s[-1] = np.zeros(self.hDim)
@@ -26,15 +25,13 @@ class RNN:
         return [o, s]
     
     def calculateTotalSquareError(self, x, y):
-        L = 0
-        for i in np.arange(len(np.atleast_1d(y))):
-            o, s = self.forwardPropagation(x[i])
-            L += np.square(o-y[i])
+        o, s = self.forwardPropagation(x)
+        L = np.square(o-y)
         return L
  
     def calculateMSE(self, x, y):
         N =  len(np.atleast_1d(y))
-        return self.calculateTotalSquareError(x,y)/N
+        return np.sum(self.calculateTotalSquareError(x,y))/N
     
     def bptt(self, x, y):
         T = len(x)
@@ -49,9 +46,21 @@ class RNN:
             for bpttStep in np.arange(0, t+1)[::-1]:
                 dLwrtW += np.outer(deltaT, s[bpttStep-1])
                 dLwrtU += np.outer(deltaT, x[bpttStep])
-                deltaT = self.W.T.dot(deltaT) * (1 - s[bpttStep-1] ** 2)
+                deltaT = self.W.T.dot(deltaT)*(1-s[bpttStep-1]**2)
         return [dLwrtU, dLwrtV, dLwrtW]
-
+    
+    def trainStep(self, x, y, learningRate):
+        dU, dV, dW = model.bptt(x, y)
+        self.U -= learningRate * dU
+        self.V -= learningRate * dV
+        self.W -= learningRate * dW
+        
+    def train(self, x, y, nepochs):
+        rate = 0.001
+        for e in range(nepochs):
+            if e%500==0:
+                print model.calculateMSE(x, y)
+            self.trainStep(x, y, rate)
     
 def sumXOR(x):
     ret = []
@@ -62,11 +71,11 @@ def sumXOR(x):
 sequenceLength = 10
 m = 20
 outputLength = 1
+numberOfEpochs = 5000
 
 xTrain = np.around(np.random.rand(m, sequenceLength))
 yTrain = np.apply_along_axis( sumXOR, axis=1, arr=xTrain )
-#print x
-#print y
+
 # x_t, input at each timestep: [10]
 # y_t, output at each timestep: [1]
 # s_t, context at each timestep: [1,2]
@@ -82,18 +91,10 @@ yTrain = np.apply_along_axis( sumXOR, axis=1, arr=xTrain )
 # v*s_t = 1x2x2x1 = 1
 
 model = RNN(sequenceLength,outputLength)
-#print "Actual loss: %f" % model.calculateMSE(xTrain, yTrain)
-dU, dV, dW = model.bptt(xTrain, yTrain)
-#print dU.shape
-#print dV.shape
-#print dW.shape
-#print dU
-#print dV
-#print dW
-#o, s = model.forwardPropagation(xTrain[0])
-#print xTrain[0].shape
-#print o.shape
-#print o
+model.train(xTrain, yTrain, numberOfEpochs)
+o, s = model.forwardPropagation(xTrain)
+print xTrain
+print o
 
 
 
