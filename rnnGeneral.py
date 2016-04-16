@@ -6,6 +6,7 @@ class RNN:
         self.iDim = iDim
         self.hDim = hDim
         self.oDim = oDim
+        np.random.seed(10)
         self.U = np.random.uniform(-np.sqrt(1./iDim), np.sqrt(1./iDim), (hDim, iDim))
         self.V = np.random.uniform(-np.sqrt(1./hDim), np.sqrt(1./hDim), (oDim, hDim))
         self.W = np.random.uniform(-np.sqrt(1./hDim), np.sqrt(1./hDim), (hDim, hDim))
@@ -15,17 +16,25 @@ class RNN:
     
         s = np.zeros((T + 1, self.hDim))
         s[-1] = np.zeros(self.hDim)
-    
+        
         o = np.zeros((T, self.iDim))
         
         for t in np.arange(T):
-            s[t] = np.tanh(self.U[:,t].dot(x) + self.W.dot(s[t-1]))
-            o[t] = self.V.dot(s[t])
+            s[t] = np.tanh(self.U.dot(x) + self.W.dot(s[t-1]))
+            o = self.V.dot(s[t])
         return [o, s]
     
-    def predict(self, x):
-        o, s = self.forwardPropagation(x)
-        return np.sum(o,axis=0)
+    def calculateTotalSquareError(self, x, y):
+        L = 0
+        for i in np.arange(len(np.atleast_1d(y))):
+            o, s = self.forwardPropagation(x)
+            L += np.square(o-y)
+        return L
+ 
+    def calculateMSE(self, x, y):
+        # Divide the total loss by the number of training examples
+        N =  len(np.atleast_1d(y))
+        return self.calculateTotalSquareError(x,y)/N
 
     
 def sumXOR(x):
@@ -56,18 +65,11 @@ yTrain = np.apply_along_axis( sumXOR, axis=1, arr=xTrain )
 # o_t = softmax(v*s_t)
 # v*s_t = 1x2x2x1 = 1
 
-np.random.seed(10)
 model = RNN(sequenceLength,outputLength)
+print "Actual loss: %f" % model.calculateMSE(xTrain[0], yTrain[0])
 #o, s = model.forwardPropagation(xTrain[0])
-predictions = model.predict(xTrain[10])
-print xTrain[0].shape
-print predictions.shape
-print predictions
-
-#print o.shape
-#print xTrain.shape
 #print xTrain[0].shape
-#print xTrain[0]
+#print o.shape
 #print o
 
 
