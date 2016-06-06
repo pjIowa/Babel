@@ -10,20 +10,23 @@ class AudioParser {
     SF_INFO soundInfo;
 
     public:
+    //raw frame X channel
     arma::mat buffer;
+    //chunk X bin of frequency strength 
     std::vector<arma::mat> frequencyMapping;
 
-    AudioParser() {
-        buffer.zeros(1, 1);
-    }
+    AudioParser() {}
 
     void readWaveFile(std::string fileName) {
+        //associate file to sound file reader
         SNDFILE *sndFile = sf_open(fileName.c_str(), SFM_READ, &soundInfo);
 
         if (sndFile == NULL) {
+            //verify file readabilitiy
             fprintf(stderr, "Error reading source file '%s': %s\n", fileName.c_str(), sf_strerror(sndFile));
         }
         else if (soundInfo.format != (SF_FORMAT_WAV | SF_FORMAT_PCM_16)) {
+            //verify file type
             fprintf(stderr, "Input should be 16-bit wave file\n");
             sf_close(sndFile);
         }
@@ -31,8 +34,13 @@ class AudioParser {
             long numFrames = soundInfo.frames;
             long numChannels = soundInfo.channels;
             long numElems = numFrames*numChannels;
+            
+            //create temporary data store 
             std::vector<double> tempBuffer(numElems);
+            
             buffer.zeros(numFrames, numChannels);
+            
+            //store frames as doubles
             double numParsedFrames = sf_readf_double(sndFile, &tempBuffer[0], soundInfo.frames);
             if (numParsedFrames != numFrames) {
                 fprintf(stderr, "Did not read enough frames for source\n");
@@ -40,6 +48,8 @@ class AudioParser {
             for(long i=0; i<numElems; i++) {
                 long row = i / numChannels;
                 long column = i % numChannels;
+                
+                //row is the frame, column is the channel
                 buffer(row,column) = tempBuffer[i];
             }
             isBufferCreated = true;
@@ -100,20 +110,20 @@ class AudioParser {
                     chunk.shed_rows(validFFTLength, fftLength-1);
 
                     //equalize frequency strengths for different fft lengths
-                    chunk /= numAvailableSamples;
+                    chunk /= validFFTLength;
 
                     //apply absolute value, combines R & I components
                     arma::vec magnitudeChunk = abs(chunk);
-
+                    
+                    //Not Necessary ATM
                     //converts magnitude to dB scale
-                    magnitudeChunk = 20.0*log10(magnitudeChunk);
+                    //magnitudeChunk = 20.0*log10(magnitudeChunk);
 
                     //replace -inf with lowest valid value
                     double minStrength = magnitudeChunk.elem(find_finite(magnitudeChunk)).min();
                     magnitudeChunk.elem( find_nonfinite(magnitudeChunk) ).fill(minStrength);
 
                     //i - channel, j - interval, k - frequency bin
-
                     for (double k=0; k<validFFTLength; k++) {
                         frequencyMapping[i](j, k) = magnitudeChunk(k);
                     }
@@ -125,10 +135,11 @@ class AudioParser {
         else {
             std::cout << "No audio data available" << std::endl;
         }
-    }
-
-    void compressFrequencyStrengths() {
-        //TODO: use autoencoder to compress into finite set of neurons
+        
+//        std::cout << "# of Raw frames: " << buffer.n_rows << std::endl;
+//        std::cout << "FFT Length: " << fftLength << std::endl;
+//        std::cout << "# of FFT Frames: " << frequencyMapping[0].n_rows << std::endl;
+//        std::cout << "# of FFT Bins per Frame: " << frequencyMapping[0].n_cols << std::endl;
     }
 
     void plotSpectrogram(bool smoothGraph) {
