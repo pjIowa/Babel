@@ -9,8 +9,8 @@ def cost(w,x,y):
 #    print y.shape
     numExamples = x.shape[0]
     predictions = predict(w, x)
-    positiveAccuracy = y*np.log10(predictions)
-    negativeAccuracy = (1-y)*np.log10(1-predictions)
+    positiveAccuracy = y*np.log(predictions)
+    negativeAccuracy = (1-y)*np.log(1-predictions)
 #    print positiveAccuracy.shape, negativeAccuracy.shape
     return -1.0/numExamples*np.sum(positiveAccuracy+negativeAccuracy)
 
@@ -24,7 +24,7 @@ def updateWeights(w,x,y):
     numExamples = x.shape[0]
 #    print predict(w,x).shape
     gradients = np.dot((predict(w, x)-y), x)
-    return w-0.001/numExamples * np.sum(gradients)
+    return w-0.0001/numExamples * np.sum(gradients)
     
 x, y = parseData()
 np.random.seed(0)
