@@ -61,11 +61,13 @@ Simple 1 hidden layer neural network ✓
 
 Lexicon of french phrases to english phrases ✓
 
-Multiclass classifier
+Multiclass classifier ✓
 
-Image recognition algorithms for different sizes
+Image recognition algorithm for different size images
 
 Audio files of all french phrases from Mac say tool
+
+Labels for input files
 
 Train algorithm
    
