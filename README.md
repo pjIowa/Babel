@@ -61,29 +61,11 @@ Simple 1 hidden layer neural network ✓
 
 Lexicon of french phrases to english phrases ✓
 
-Simple recurrent neural network (RNN) ✓
+Multiclass classifier
 
-![recurrent neural net loss](screenshots/rnn_loss.png)
-
-RNN with non-linear activations
-
-Long Short Term Memory (LSTM)
+Image recognition algorithms for different sizes
 
 Audio files of all french phrases from Mac say tool
-
-Create lookup for output sequence
-
-Either:
-
-predict number of words then
-
-predict output sequence in English
-
-Or:
-
-predict sequences of different lengths then
-
-output sequence with highest probability
 
 Train algorithm
    
