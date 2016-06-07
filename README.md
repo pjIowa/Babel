@@ -65,6 +65,8 @@ Multiclass classifier ✓
 
 Image recognition algorithm for different size images
 
+Curve comparison algorithm for all frequencies
+
 Audio files of all french phrases from Mac say tool
 
 Labels for input files
