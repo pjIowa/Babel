@@ -83,6 +83,8 @@ Deploy app on iPhone for Bluetooth earbuds
    http://marsyasweb.appspot.com/download/data_sets/ , files vs. music genre
    
    http://www.manythings.org/bilingual/ , translation corpus for english vs. other other languages ✓
+   
+   https://archive.ics.uci.edu/ml/datasets/Iris, flower measurements vs. iris type ✓
 
 ## References:
    Andrew Ng paper on speech classification
