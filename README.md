@@ -59,19 +59,33 @@ Simple 1 hidden layer neural network ✓
 
 ![neural net loss](screenshots/h1_neural_net.png)
 
-Lexicon of french phrases to english phrases ✓
-
 Multiclass classifier ✓
 
 Image recognition algorithm for different size images
 
 Curve comparison algorithm for all frequencies
 
+Lexicon of french phrases to english phrases
+
+Audio files of all french words from Mac say tool
+
+Labels for audio files
+
+Train algorithm for words
+
+Reduce dimensions using PCA
+
+Train algorithm for words
+
+Develop memory for parsing phrases
+
+Lexicon of french phrases to english phrases ✓
+
 Audio files of all french phrases from Mac say tool
 
-Labels for input files
+Labels for audio files
 
-Train algorithm
+Train algorithm for phrases
    
 Deploy app on iPhone for Bluetooth earbuds
 
