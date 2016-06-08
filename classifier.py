@@ -2,7 +2,8 @@ import numpy as np
 
 def parseData():
     csv = np.genfromtxt ('diabetes.csv', delimiter=',')
-    return csv[:,:-1], csv[:,-1]
+    x = csv[:,:-1]
+    return np.hstack((np.ones((x.shape[0], 1)), x)), csv[:,-1]
 
 def cost(w,x,y):
 #    print predict(w,x).shape
@@ -33,6 +34,8 @@ w = np.random.rand(x.shape[1])
 #print y.shape
 #print w.shape
 print cost(w, x, y)
+#print np.sum((y - predict(w,x))**2)
 for i in range(100):
     w = updateWeights(w, x, y)
     print cost(w, x, y)
+#print np.sum((y - predict(w,x))**2)

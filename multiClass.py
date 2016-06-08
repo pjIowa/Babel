@@ -11,7 +11,8 @@ def parseData():
 #    print y[0], y[51], y[101]
     y = np.array([[1.0*(elem==j) for j in allLabelNames] for elem in y])
 #    print y[0], y[51], y[101]
-    return csv[:,:-1].astype(np.float), y, numLabels
+    x = csv[:,:-1].astype(np.float)
+    return np.hstack((np.ones((x.shape[0], 1)), x)), y, numLabels
 
 def cost(w,x,y):
 #    print predict(w,x).shape
@@ -49,15 +50,9 @@ w = np.random.rand(x.shape[1], numLabels)
 #print y.shape
 #print w.shape
 #print w
+#print np.sum((y - predict(w,x))**2)
 print cost(w, x, y)
 for i in range(100):
     w = updateWeights(w, x, y)
-#    print w
     print cost(w, x, y)
-
-#data = np.array([0,1,2,0,1,2])
-#
-#print data
-#print range(numLabels)
-#print np.array([[1.0*elem==j for j in range(numLabels)] for elem in data], dtype=float)
-#print [i in numLabels for i in data]
+#print np.sum((y - predict(w,x))**2)
