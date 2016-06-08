@@ -61,6 +61,8 @@ Simple 1 hidden layer neural network ✓
 
 Multiclass classifier ✓
 
+![Multiclass classifier loss](screenshots/multiclass.png)
+
 Image recognition algorithm for different size images
 
 Curve comparison algorithm for all frequencies
