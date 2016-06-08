@@ -61,29 +61,15 @@ Simple 1 hidden layer neural network ✓
 
 Lexicon of french phrases to english phrases ✓
 
-Simple recurrent neural network (RNN) ✓
+Multiclass classifier ✓
 
-![recurrent neural net loss](screenshots/rnn_loss.png)
+Image recognition algorithm for different size images
 
-RNN with non-linear activations
-
-Long Short Term Memory (LSTM)
+Curve comparison algorithm for all frequencies
 
 Audio files of all french phrases from Mac say tool
 
-Create lookup for output sequence
-
-Either:
-
-predict number of words then
-
-predict output sequence in English
-
-Or:
-
-predict sequences of different lengths then
-
-output sequence with highest probability
+Labels for input files
 
 Train algorithm
    
@@ -99,6 +85,8 @@ Deploy app on iPhone for Bluetooth earbuds
    http://marsyasweb.appspot.com/download/data_sets/ , files vs. music genre
    
    http://www.manythings.org/bilingual/ , translation corpus for english vs. other other languages ✓
+   
+   https://archive.ics.uci.edu/ml/datasets/Iris, flower measurements vs. iris type ✓
 
 ## References:
    Andrew Ng paper on speech classification
