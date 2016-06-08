@@ -109,18 +109,6 @@ Deploy app on iPhone for Bluetooth earbuds
 
    http://papers.nips.cc/paper/3674-unsupervised-feature-learning-for-audio-classification-using-convolutional-deep-belief-networks.pdf
    
-   RNN implentation in Python
-   
-   http://peterroelants.github.io/posts/rnn_implementation_part01/
-   
-   RBM implementation in Python
-
-   https://github.com/echen/restricted-boltzmann-machines
-   
-   An Introduction to Restricted Boltzmann Machines, pseudocode and explanation of use and limitations
-   
-   http://image.diku.dk/igel/paper/AItRBM-proof.pdf
-   
    Montreal paper on music genre classification
    
    http://ismir2010.ismir.net/proceedings/ismir2010-58.pdf
