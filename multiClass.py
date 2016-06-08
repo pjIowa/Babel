@@ -1,5 +1,6 @@
 
 import numpy as np
+import time
 
 def parseData():
     csv = np.loadtxt ('iris.csv', delimiter=',', dtype = str)
@@ -39,11 +40,13 @@ def updateWeights(w,x,y):
 #    print predict(w,x).shape
     gradients = np.dot((predict(w, x)-y).T, x).T
 #    print gradients.shape
-    return w-0.001/numExamples * np.sum(gradients)
+    return w-0.00001/numExamples * np.sum(gradients)
     
+
+print "\nMulticlass Classifer trained on iris dataset\n"
+start_time = time.time()
 x, y, numLabels = parseData()
 #print y[0], x[0]
-
 np.random.seed(0)
 w = np.random.rand(x.shape[1], numLabels)
 #print x.shape
@@ -51,8 +54,10 @@ w = np.random.rand(x.shape[1], numLabels)
 #print w.shape
 #print w
 #print np.sum((y - predict(w,x))**2)
-print cost(w, x, y)
-for i in range(100):
+#print cost(w, x, y)
+for i in range(4000):
     w = updateWeights(w, x, y)
-    print cost(w, x, y)
+    if i%400 == 0:
+        print "Step ", i, "\t", cost(w, x, y)
+print "\nTraining Time: ", (time.time() - start_time)*1000, "ms\n"
 #print np.sum((y - predict(w,x))**2)
