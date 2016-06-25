@@ -63,9 +63,9 @@ Multiclass classifier ✓
 
 ![Multiclass classifier loss](screenshots/multiclass.png)
 
-Image classification
+Simple image classifier
 
-Image recognition algorithm for different size images using pyramid kernel
+Image classifier for different size images using pyramid kernel
 
 Curve comparison algorithm for all frequencies
 
@@ -91,7 +91,9 @@ Labels for audio files
 
 Train algorithm for phrases
    
-Deploy app on iPhone for Bluetooth earbuds
+Deploy app on iPhone to hook up w/ wearable mic and microphone
+
+Wearables: Zungle Panther / earbud
 
 ## External Datasets to Use:
    http://archive.ics.uci.edu/ml/datasets/Pima+Indians+Diabetes , body measurements vs. existence of diabetes ✓
