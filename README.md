@@ -63,7 +63,9 @@ Multiclass classifier ✓
 
 ![Multiclass classifier loss](screenshots/multiclass.png)
 
-Image recognition algorithm for different size images
+Image classification
+
+Image recognition algorithm for different size images using pyramid kernel
 
 Curve comparison algorithm for all frequencies
 
