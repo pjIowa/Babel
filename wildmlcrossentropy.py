@@ -9,9 +9,10 @@ class WML:
         self.loadData()
         self.loadWeights()
         np.set_printoptions(suppress=True)
+        print self.X.shape, self.y.shape
 
         # relu helpers
-        self.activateRELU = lambda x: np.maximum(0,x)
+        self.RELU = lambda x: np.maximum(0,x)
         self.derivativeRELU = lambda x: 1.*(x>0)
         
         self.epsilon = 0.01 # learning rate for gradient descent
@@ -36,7 +37,7 @@ class WML:
     def calculate_loss(self):
         # Forward propagation to calculate our predictions
         z1 = self.X.dot(self.w1)
-        a1 = self.activateRELU(z1)
+        a1 = self.RELU(z1)
         z2 = a1.dot(self.w2)
         exp_scores = np.exp(z2)
         probs = exp_scores / np.sum(exp_scores, axis=1, keepdims=True)
@@ -53,7 +54,7 @@ class WML:
     def predict(self):
         # Forward propagation
         z1 = self.X.dot(self.w1)
-        a1 = self.activateRELU(z1)
+        a1 = self.RELU(z1)
         z2 = a1.dot(self.w2)
         exp_scores = np.exp(z2)
         probs = exp_scores / np.sum(exp_scores, axis=1, keepdims=True)
@@ -62,7 +63,7 @@ class WML:
     def updateWeights(self):
         # Forward propagation
         z1 = self.X.dot(self.w1)
-        a1 = self.activateRELU(z1)
+        a1 = self.RELU(z1)
         z2 = a1.dot(self.w2)
         exp_scores = np.exp(z2)
         probs = exp_scores / np.sum(exp_scores, axis=1, keepdims=True)
